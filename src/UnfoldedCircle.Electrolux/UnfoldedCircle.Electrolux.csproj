@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <AssemblyName>driver</AssemblyName>
+        <RuntimeIdentifier Condition="'$(BuildForLinuxArm)' == 'true'">linux-arm64</RuntimeIdentifier>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <IsTrimmable>true</IsTrimmable>
+        <IsAotCompatible>true</IsAotCompatible>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(PublishUsingAot)' == 'true'">
+        <PublishAot>true</PublishAot>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(PublishUsingAot)' != 'true'">
+        <PublishSingleFile>true</PublishSingleFile>
+        <PublishTrimmed>true</PublishTrimmed>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+        <ExcludeFromSingleFile>appsettings.json</ExcludeFromSingleFile>
+        <ExcludeFromSingleFile>appsettings.Development.json</ExcludeFromSingleFile>
+        <ExcludeFromSingleFile>driver.json</ExcludeFromSingleFile>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(SelfContained)' == 'true'">
+        <PublishSingleFile>true</PublishSingleFile>
+        <PublishTrimmed>true</PublishTrimmed>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
+        <Content Update="appsettings.Development.json">
+          <DependentUpon>appsettings.json</DependentUpon>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Meziantou.Analyzer" Version="3.0.17">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="NetEscapades.EnumGenerators" Version="1.0.0-beta20" />
+        <PackageReference Include="Theodicean.SourceGenerators" Version="0.0.4" PrivateAssets="all" ExcludeAssets="runtime">
+            <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Theodicean.UnfoldedCircle.Server" Version="0.0.7-pre01" />
+    </ItemGroup>
+
+</Project>
