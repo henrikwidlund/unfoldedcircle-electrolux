@@ -445,7 +445,7 @@ internal sealed class ElectroluxWebSocketHandler(
 
     private static SettingsPage CreateSettingsPage(UnfoldedCircleConfigurationItem? configurationItem)
     {
-        const string regexPatterhn = "\\S+";
+        const string regexPattern = "\\S+";
         return new SettingsPage
         {
             Title = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["en"] = configurationItem is null ? "Add a new device" : "Reconfigure device" },
@@ -457,7 +457,7 @@ internal sealed class ElectroluxWebSocketHandler(
                     {
                         Text = new ValueRegex
                         {
-                            RegEx = regexPatterhn
+                            RegEx = regexPattern
                         }
                     },
                     Label = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["en"] = "Enter API Key (mandatory)" }
@@ -469,7 +469,7 @@ internal sealed class ElectroluxWebSocketHandler(
                     {
                         Text = new ValueRegex
                         {
-                            RegEx = regexPatterhn
+                            RegEx = regexPattern
                         }
                     },
                     Label = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["en"] = "Enter Refresh Token (mandatory)" }
