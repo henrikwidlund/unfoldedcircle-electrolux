@@ -17,19 +17,19 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
 
     private static readonly SemaphoreSlim TokenSemaphore = new(1, 1);
 
-    public async ValueTask AddTokenAsync(TokenResult tokenResult)
+    public async ValueTask AddTokenAsync(TokenResult tokenResult, CancellationToken cancellationToken)
     {
-        if (await TokenSemaphore.WaitAsync(TimeSpan.FromSeconds(1)))
+        // we must wait to ensure that the token can be saved
+        await TokenSemaphore.WaitAsync(cancellationToken);
+        try
         {
-            try
-            {
-                await using var fileStream = File.Open("token.json", FileMode.Create, FileAccess.Write, FileShare.None);
-                await JsonSerializer.SerializeAsync(fileStream, tokenResult, ElectroluxJsonSerializerContext.Default.TokenResult);
-            }
-            finally
-            {
-                TokenSemaphore.Release();
-            }
+            await using var fileStream = File.Open("token.json", FileMode.Create, FileAccess.Write, FileShare.None);
+            await JsonSerializer.SerializeAsync(fileStream, tokenResult, ElectroluxJsonSerializerContext.Default.TokenResult,
+                CancellationToken.None);
+        }
+        finally
+        {
+            TokenSemaphore.Release();
         }
     }
 

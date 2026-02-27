@@ -409,7 +409,8 @@ internal sealed class ElectroluxWebSocketHandler(
         var apiKey = payload.MsgData.InputValues![ElectroluxServerConstants.ApiKeyKey];
         var refreshToken = payload.MsgData.InputValues![ElectroluxServerConstants.RefreshTokenKey];
 
-        await _electroluxClient.AddTokenAsync(new TokenResult(null, refreshToken, DateTimeOffset.MinValue, apiKey));
+        await _electroluxClient.AddTokenAsync(new TokenResult(null, refreshToken, DateTimeOffset.MinValue, apiKey),
+            cancellationToken);
         await foreach (var applianceResult in _electroluxClient.GetAirPurifiersAsync(cancellationToken))
         {
             var entity = configuration.Entities.FirstOrDefault(x => x.EntityId.Equals(applianceResult.ApplianceId, StringComparison.OrdinalIgnoreCase));
