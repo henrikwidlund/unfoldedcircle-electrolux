@@ -33,6 +33,9 @@ jq --arg version "$unprefixed_version" --arg date "$date" \
 # Copy driver.json to the root of the driver directory
 cp ./driver.json ./driverdir/
 
+# Copy icon to root of the driver directory
+cp ../electrolux.png ./driverdir/
+
 # Copy appsettings*.json to the bin directory
 cp ./appsettings*.json ./driverdir/bin/
 
