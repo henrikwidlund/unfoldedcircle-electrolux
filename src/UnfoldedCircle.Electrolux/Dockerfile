@@ -18,6 +18,9 @@ RUN dotnet publish "UnfoldedCircle.Electrolux.csproj" -c "$BUILD_CONFIGURATION" 
 RUN touch /app/publish/configured_entities.json && \
     chown "$APP_UID" /app/publish/configured_entities.json && \
     chmod 644 /app/publish/configured_entities.json
+RUN touch /app/publish/configured_entities.json /app/publish/token.json && \
+    chown "$APP_UID" /app/publish/configured_entities.json /app/publish/token.json && \
+    chmod 644 /app/publish/configured_entities.json /app/publish/token.json \
 
 FROM base AS final
 USER $APP_UID
