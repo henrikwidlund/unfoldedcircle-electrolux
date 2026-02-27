@@ -107,7 +107,8 @@ internal sealed class ElectroluxWebSocketHandler(
             switch (index)
             {
                 case < 0 or > SelectLevelsMaxIndex when !cycle:
-                    return new SelectCommandResult(EntityCommandResult.Failure, string.Empty);
+                    // do nothing
+                    return new SelectCommandResult(EntityCommandResult.Other, string.Empty);
                 case > SelectLevelsMaxIndex:
                     index = 0;
                     break;
