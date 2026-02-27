@@ -197,7 +197,7 @@ public sealed record RefreshTokenResponse(
     [property: JsonPropertyName("refreshToken")] string RefreshToken);
 
 public sealed record Appliance(
-    [property:JsonPropertyName("applianceId")] string ApplianceId);
+    [property: JsonPropertyName("applianceId")] string ApplianceId);
 
 public sealed record ApplianceInfo(
     [property: JsonPropertyName("deviceType")] string DeviceType,
