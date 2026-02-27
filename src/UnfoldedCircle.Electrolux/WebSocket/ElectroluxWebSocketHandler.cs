@@ -407,7 +407,7 @@ internal sealed class ElectroluxWebSocketHandler(
     {
         var configuration = await _configurationService.GetConfigurationAsync(cancellationToken);
         var apiKey = payload.MsgData.InputValues![ElectroluxServerConstants.ApiKeyKey];
-        var refreshToken = payload.MsgData.InputValues![ElectroluxServerConstants.RefreshTokenKey];
+        var refreshToken = payload.MsgData.InputValues[ElectroluxServerConstants.RefreshTokenKey];
 
         await _electroluxClient.AddTokenAsync(new TokenResult(null, refreshToken, DateTimeOffset.MinValue, apiKey),
             cancellationToken);
