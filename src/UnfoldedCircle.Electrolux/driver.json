@@ -5,7 +5,7 @@
   "name": {
     "en": "Electrolux"
   },
-  "icon": "uc:tv",
+  "icon": "uc:climate",
   "description": {
     "en": "Integration for Electrolux Air Purifiers"
   },

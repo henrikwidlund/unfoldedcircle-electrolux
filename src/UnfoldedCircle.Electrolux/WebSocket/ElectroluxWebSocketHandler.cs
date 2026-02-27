@@ -416,6 +416,7 @@ internal sealed class ElectroluxWebSocketHandler(
             var entity = configuration.Entities.FirstOrDefault(x => x.EntityId.Equals(applianceResult.ApplianceId, StringComparison.OrdinalIgnoreCase));
             if (entity is null)
             {
+                _logger.AddingConfigurationForDevice(applianceResult.ApplianceId);
                 entity = new UnfoldedCircleConfigurationItem
                 {
                     Host = "N/A",

@@ -33,7 +33,7 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
         }
     }
 
-    public async ValueTask<TokenResult?> GetTokenAsync(CancellationToken cancellationToken)
+    private async ValueTask<TokenResult?> GetTokenAsync(CancellationToken cancellationToken)
     {
         if (_currentToken?.ExpiresAt > DateTimeOffset.UtcNow.AddMinutes(-5))
             return _currentToken;
@@ -89,7 +89,7 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
         return null;
     }
 
-    public async Task<Appliance[]?> GetAppliancesAsync(CancellationToken cancellationToken)
+    private async Task<Appliance[]?> GetAppliancesAsync(CancellationToken cancellationToken)
     {
         var tokenResult = await GetTokenAsync(cancellationToken);
         if (tokenResult == null)
@@ -105,7 +105,7 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
         return await response.Content.ReadFromJsonAsync<Appliance[]>(ElectroluxJsonSerializerContext.Default.ApplianceArray, cancellationToken);
     }
 
-    public async Task<ApplianceInfo?> GetApplianceInfoAsync(string applianceId, CancellationToken cancellationToken)
+    private async Task<ApplianceInfo?> GetApplianceInfoAsync(string applianceId, CancellationToken cancellationToken)
     {
         var tokenResult = await GetTokenAsync(cancellationToken);
         if (tokenResult == null)
@@ -226,7 +226,10 @@ public sealed record PurifierCommand(
     [property: JsonPropertyName("Fanspeed"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] sbyte? FanSpeed);
 
 public sealed record ApplianceState([property: JsonPropertyName("properties")] ApplianceProperties Properties);
+
 public sealed record ApplianceProperties([property: JsonPropertyName("reported")] ApplianceReportedProperty Reported);
+
+// ReSharper disable InconsistentNaming
 public sealed record ApplianceReportedProperty(
     [property: JsonPropertyName("Workmode")] WorkMode WorkMode,
     [property: JsonPropertyName("Fanspeed")] sbyte FanSpeed,
@@ -239,3 +242,4 @@ public sealed record ApplianceReportedProperty(
     ushort PM10,
     ushort ECO2
 );
+// ReSharper restore InconsistentNaming
