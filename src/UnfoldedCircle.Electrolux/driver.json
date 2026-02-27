@@ -7,7 +7,7 @@
   },
   "icon": "uc:tv",
   "description": {
-    "en": "Integration for Electrolux Air Conditioners"
+    "en": "Integration for Electrolux Air Purifiers"
   },
   "developer": {
     "name": "Henrik Widlund",
@@ -24,7 +24,7 @@
         "field": {
           "label": {
             "value": {
-              "en": "You will be guided through the setup process to connect to your Electrolux Air Conditioner."
+              "en": "You will be guided through the setup process to connect to your Electrolux Air Purifier."
             }
           }
         },
