@@ -1,0 +1,137 @@
+name: GitHub Release
+
+on:
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Release native binaries
+    permissions:
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+      contents: write
+    strategy:
+      matrix:
+        kind: [ 'linux-amd64', 'linux-arm64', 'macos-amd64', 'macos-arm64', 'windows-amd64', 'windows-arm64' ]
+        include:
+          - kind: linux-amd64
+            os: ubuntu-latest
+            target: linux-x64
+          - kind: linux-arm64
+            os: ubuntu-24.04-arm
+            target: linux-arm64
+          - kind: macos-amd64
+            os: macos-15-intel
+            target: osx-x64
+          - kind: macos-arm64
+            os: macos-latest
+            target: osx-arm64
+          - kind: windows-amd64
+            os: windows-latest
+            target: win-x64
+          - kind: windows-arm64
+            os: windows-11-arm
+            target: win-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag=$(git describe --tags --abbrev=0)
+          date=$(date -u +"%Y-%m-%d")
+          ASSEMBLY_VERSION="${tag//v}"
+          jq --arg version "$ASSEMBLY_VERSION" --arg date "$date" \
+            '.version = $version | .release_date = $date' \
+            src/UnfoldedCircle.Electrolux/driver.json > tmp.json && mv tmp.json src/UnfoldedCircle.Electrolux/driver.json
+          
+          # Build everything
+          release_name="unfolded-circle-electrolux-$tag-${{ matrix.kind }}"
+          
+          dotnet publish ./src/UnfoldedCircle.Electrolux/UnfoldedCircle.Electrolux.csproj -r ${{ matrix.target }} -c Release -o ./publish -p:Version="$ASSEMBLY_VERSION" -p:PublishAot=true
+          if [ "${{ matrix.target }}" == "linux-arm64" ]; then
+            launcher_tag=$(gh release list --repo henrikwidlund/unfoldedcircle-launcher --limit 1 --json tagName --jq '.[0].tagName')
+            if [ -z "$launcher_tag" ]; then
+              echo "No releases found in henrikwidlund/unfoldedcircle-launcher" >&2
+              exit 1
+            fi
+
+            gh release download --repo henrikwidlund/unfoldedcircle-launcher "$launcher_tag" \
+              --pattern "*.tar.gz" \
+              --dir ./publish-launcher
+          
+            shopt -s nullglob
+            launcher_archives=(./publish-launcher/*.tar.gz)
+            if [ ${#launcher_archives[@]} -eq 0 ]; then
+              echo "No launcher archives found in ./publish-launcher" >&2
+              exit 1
+            fi
+            for archive in "${launcher_archives[@]}"; do
+              gh attestation verify "$archive" \
+                --repo henrikwidlund/unfoldedcircle-launcher
+            done
+          
+            mkdir driverdir && mkdir driverdir/bin && mkdir driverdir/config && mkdir driverdir/data && mkdir driverdir/bin/certs && mkdir publish-launcher-extracted
+          
+            # Extract the launcher (driver) tarball
+            tar -xzvf ./publish-launcher/*.tar.gz -C ./publish-launcher-extracted
+          
+            # Copy the launcher bundle contents to the driver directory
+            cp publish-launcher-extracted/driver driverdir/bin/driver
+            cp publish-launcher-extracted/driver.dbg driverdir/bin/driver.dbg
+            cp publish-launcher-extracted/certs/* driverdir/bin/certs/ 2>/dev/null || true
+            
+            cp publish/driver.json driverdir/driver.json
+            cp ./electrolux.png ./driverdir/electrolux.png
+            cp publish/appsettings*.json driverdir/bin/
+
+            # Copy the Electrolux driver binary and debug symbols to the driver directory as `app`
+            cp publish/driver driverdir/bin/app
+            cp publish/driver.dbg driverdir/bin/app.dbg
+
+            tar -czvf unfolded-circle-electrolux-$tag-remote.tar.gz -C ./driverdir .
+
+            # Delete output directory
+            rm -r "./driverdir"
+          fi
+          
+          if [ "${{ matrix.kind }}" = "windows-amd64" ] || [ "${{ matrix.kind }}" = "windows-arm64" ]; then
+            # Pack to zip for Windows
+            7z a -tzip "${release_name}.zip" "./publish/*"
+          else
+            # Pack tar.gz for non-Windows
+            tar -czvf "${release_name}.tar.gz" -C ./publish .
+          fi
+          
+          # Delete output directory
+          rm -r "./publish"
+
+      - name: Publish
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
+        with:
+          files: |
+            unfolded-circle-electrolux*.zip
+            unfolded-circle-electrolux*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Attest build provenance
+        uses: actions/attest@v4.1.0
+        with:
+          subject-path: |
+            unfolded-circle-electrolux*.tar.gz
+            unfolded-circle-electrolux*.zip

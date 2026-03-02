@@ -1,0 +1,51 @@
+{
+  "driver_id": "electrolux-unfolded-circle",
+  "version": "0.0.1",
+  "min_core_api": "0.20.0",
+  "name": {
+    "en": "Electrolux"
+  },
+  "icon": "custom:electrolux.png",
+  "description": {
+    "en": "Integration for Electrolux Air Purifiers"
+  },
+  "developer": {
+    "name": "Henrik Widlund",
+    "email": "07online_rodeo@icloud.com",
+    "url": "https://github.com/henrikwidlund/unfoldedcircle-electrolux"
+  },
+  "setup_data_schema": {
+    "title": {
+      "en": "Setup Process"
+    },
+    "settings": [
+      {
+        "id": "disclaimer_0",
+        "field": {
+          "label": {
+            "value": {
+              "en": "You will be guided through the setup process to connect to your Electrolux Air Purifier."
+            }
+          }
+        },
+        "label": {
+          "en": ""
+        }
+      },
+      {
+        "id": "disclaimer_1",
+        "field": {
+          "label": {
+            "value": {
+              "en": "Ensure that you have an API Key and Refresh Token from Electrolux."
+            }
+          }
+        },
+        "label": {
+          "en": "Before you begin"
+        }
+      }
+    ]
+  },
+  "release_date": "2026-02-25"
+}
