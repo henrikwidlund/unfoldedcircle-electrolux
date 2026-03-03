@@ -31,10 +31,10 @@ internal sealed class ElectroluxWebSocketHandler(
     private static readonly ConcurrentDictionary<string, sbyte?> ReportedEntityIdSelect = new(StringComparer.OrdinalIgnoreCase);
     private static readonly ConcurrentDictionary<string, short?> ReportedEntityIdSensorTemperature = new(StringComparer.OrdinalIgnoreCase);
     private static readonly ConcurrentDictionary<string, sbyte?> ReportedEntityIdSensorHumidity = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly ConcurrentDictionary<string, int?> ReportedEntityIdSensorTvoc = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly ConcurrentDictionary<string, int?> ReportedEntityIdSensorCo2 = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly ConcurrentDictionary<string, int?> ReportedEntityIdSensorPm1 = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly ConcurrentDictionary<string, int?> ReportedEntityIdSensorPm25 = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, ushort?> ReportedEntityIdSensorTvoc = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, ushort?> ReportedEntityIdSensorCo2 = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, ushort?> ReportedEntityIdSensorPm1 = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, ushort?> ReportedEntityIdSensorPm25 = new(StringComparer.OrdinalIgnoreCase);
     private static readonly ConcurrentDictionary<string, ushort?> ReportedEntityIdSensorPm10 = new(StringComparer.OrdinalIgnoreCase);
     private static readonly ConcurrentDictionary<string, ushort?> ReportedEntityIdSensorEco2 = new(StringComparer.OrdinalIgnoreCase);
     private static readonly ClimateOptions ClimateOptions = new() { TemperatureUnit = TemperatureUnit.Celsius };
@@ -320,7 +320,7 @@ internal sealed class ElectroluxWebSocketHandler(
         }
         return SendMessageAsync(socket,
             ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
-                new SensorStateChangedEventMessageDataAttributes<int>
+                new SensorStateChangedEventMessageDataAttributes<short>
                 {
                     State = SensorState.On,
                     Value = applianceState.Properties.Reported.Temperature
@@ -350,7 +350,7 @@ internal sealed class ElectroluxWebSocketHandler(
         }
         return SendMessageAsync(socket,
             ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
-                new SensorStateChangedEventMessageDataAttributes<int>
+                new SensorStateChangedEventMessageDataAttributes<sbyte>
                 {
                     State = SensorState.On,
                     Value = applianceState.Properties.Reported.Humidity
@@ -380,7 +380,7 @@ internal sealed class ElectroluxWebSocketHandler(
         }
         return SendMessageAsync(socket,
             ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
-                new SensorStateChangedEventMessageDataAttributes<double> { State = SensorState.On, Value = applianceState.Properties.Reported.Tvoc },
+                new SensorStateChangedEventMessageDataAttributes<ushort> { State = SensorState.On, Value = applianceState.Properties.Reported.Tvoc },
                 entityId,
                 ElectroluxServerConstants.TvocSuffix),
             wsId,
@@ -406,7 +406,7 @@ internal sealed class ElectroluxWebSocketHandler(
         }
         return SendMessageAsync(socket,
                 ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
-                    new SensorStateChangedEventMessageDataAttributes<double> { State = SensorState.On, Value = applianceState.Properties.Reported.Co2 },
+                    new SensorStateChangedEventMessageDataAttributes<ushort> { State = SensorState.On, Value = applianceState.Properties.Reported.Co2 },
                     entityId,
                     ElectroluxServerConstants.Co2Suffix),
                 wsId,
@@ -432,7 +432,7 @@ internal sealed class ElectroluxWebSocketHandler(
         }
         return SendMessageAsync(socket,
             ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
-                new SensorStateChangedEventMessageDataAttributes<double> { State = SensorState.On, Value = applianceState.Properties.Reported.Pm1 },
+                new SensorStateChangedEventMessageDataAttributes<ushort> { State = SensorState.On, Value = applianceState.Properties.Reported.Pm1 },
                 entityId,
                 ElectroluxServerConstants.Pm1Suffix),
             wsId,
@@ -458,7 +458,7 @@ internal sealed class ElectroluxWebSocketHandler(
         }
         return SendMessageAsync(socket,
             ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
-                new SensorStateChangedEventMessageDataAttributes<double> { State = SensorState.On, Value = applianceState.Properties.Reported.Pm25 },
+                new SensorStateChangedEventMessageDataAttributes<ushort> { State = SensorState.On, Value = applianceState.Properties.Reported.Pm25 },
                 entityId,
                 ElectroluxServerConstants.Pm25Suffix),
             wsId,
@@ -484,7 +484,7 @@ internal sealed class ElectroluxWebSocketHandler(
         }
         return SendMessageAsync(socket,
             ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
-                new SensorStateChangedEventMessageDataAttributes<double> { State = SensorState.On, Value = applianceState.Properties.Reported.Pm10 },
+                new SensorStateChangedEventMessageDataAttributes<ushort> { State = SensorState.On, Value = applianceState.Properties.Reported.Pm10 },
                 entityId,
                 ElectroluxServerConstants.Pm10Suffix),
             wsId,
@@ -510,7 +510,7 @@ internal sealed class ElectroluxWebSocketHandler(
         }
         return SendMessageAsync(socket,
             ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
-                new SensorStateChangedEventMessageDataAttributes<double> { State = SensorState.On, Value = applianceState.Properties.Reported.Eco2 },
+                new SensorStateChangedEventMessageDataAttributes<ushort> { State = SensorState.On, Value = applianceState.Properties.Reported.Eco2 },
                 entityId,
                 ElectroluxServerConstants.Eco2Suffix),
             wsId,
