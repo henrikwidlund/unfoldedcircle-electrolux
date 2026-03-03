@@ -241,12 +241,12 @@ public sealed record ApplianceProperties([property: JsonPropertyName("reported")
 public sealed record ApplianceReportedProperty(
     [property: JsonPropertyName("Workmode")] WorkMode WorkMode,
     [property: JsonPropertyName("Fanspeed")] sbyte FanSpeed,
-    double? TVOC,
+    int TVOC,
     ushort CO2,
     [property: JsonPropertyName("Temp")] short Temperature,
     sbyte Humidity,
     ushort PM1,
-    ushort PM2_5,
+    [property: JsonPropertyName("PM2_5")] ushort PM25,
     ushort PM10,
     ushort ECO2
 );

@@ -28,7 +28,15 @@ internal sealed class ElectroluxWebSocketHandler(
     private readonly ElectroluxClient _electroluxClient = electroluxClient;
     private static readonly ConcurrentDictionary<string, ClimateState> ReportedEntityIdStates = new(StringComparer.OrdinalIgnoreCase);
     private static readonly ConcurrentDictionary<string, short> ReportedEntityIdTemperature = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly ConcurrentDictionary<string, sbyte> ReportedEntityIdSelect = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, sbyte?> ReportedEntityIdSelect = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, short?> ReportedEntityIdSensorTemperature = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, sbyte?> ReportedEntityIdSensorHumidity = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, int?> ReportedEntityIdSensorTVOC = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, int?> ReportedEntityIdSensorCO2 = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, int?> ReportedEntityIdSensorPM1 = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, int?> ReportedEntityIdSensorPM25 = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, ushort?> ReportedEntityIdSensorPM10 = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, ushort?> ReportedEntityIdSensorECO2 = new(StringComparer.OrdinalIgnoreCase);
     private static readonly ClimateOptions ClimateOptions = new() { TemperatureUnit = TemperatureUnit.Celsius };
     private static readonly string[] SelectOptions = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
     private const int SelectLevelsMaxIndex = 8;
@@ -161,39 +169,48 @@ internal sealed class ElectroluxWebSocketHandler(
         {
             do
             {
-                await Parallel.ForEachAsync(subscribedEntitiesHolder.SubscribedEntities.Values.SelectMany(static x => x), cancellationToken,
+                await Parallel.ForEachAsync(subscribedEntitiesHolder.SubscribedEntities, cancellationToken,
                     async (subscribedEntity, token) =>
                     {
                         try
                         {
-                            var applianceState = await _electroluxClient.GetApplianceStateAsync(subscribedEntity.EntityId.GetBaseIdentifier(), token);
+                            var applianceState = await _electroluxClient.GetApplianceStateAsync(subscribedEntity.Key, token);
                             if (applianceState is null)
                             {
-                                _logger.CouldNotGetApplianceState(wsId, subscribedEntity.EntityId);
+                                _logger.CouldNotGetApplianceState(wsId, subscribedEntity.Key);
                                 return;
                             }
 
                             await Task.WhenAll(
-                                ReportClimate(socket, wsId, applianceState, subscribedEntity.EntityId, token),
-                                ReportSelect(socket, wsId, applianceState, subscribedEntity.EntityId, token));
+                                ReportClimate(socket, wsId, applianceState, subscribedEntity.Value, token),
+                                ReportSelect(socket, wsId, applianceState, subscribedEntity.Value, token),
+                                ReportSensors(socket, wsId, applianceState, subscribedEntity.Value, token));
                         }
                         catch (Exception e)
                         {
                             // This is expected from control flow, no need to spam logs
                             if (e is OperationCanceledException)
                                 return;
-                            _logger.FailureDuringEvent(e, wsId, subscribedEntity.EntityId);
+                            _logger.FailureDuringEvent(e, wsId, subscribedEntity.Key);
                         }
                     });
             } while (!cancellationToken.IsCancellationRequested && await periodicTimer.WaitForNextTickAsync(cancellationToken));
         }
         finally
         {
-            foreach (var entityId in subscribedEntitiesHolder.SubscribedEntities.Keys)
+            foreach (var entityId in subscribedEntitiesHolder.SubscribedEntities.Values.SelectMany(static x => x.Select(static e => e.EntityId)))
             {
                 ReportedEntityIdStates.TryRemove(entityId, out _);
                 ReportedEntityIdTemperature.TryRemove(entityId, out _);
                 ReportedEntityIdSelect.TryRemove(entityId, out _);
+                ReportedEntityIdSensorTemperature.TryRemove(entityId, out _);
+                ReportedEntityIdSensorHumidity.TryRemove(entityId, out _);
+                ReportedEntityIdSensorTVOC.TryRemove(entityId, out _);
+                ReportedEntityIdSensorCO2.TryRemove(entityId, out _);
+                ReportedEntityIdSensorPM1.TryRemove(entityId, out _);
+                ReportedEntityIdSensorPM25.TryRemove(entityId, out _);
+                ReportedEntityIdSensorPM10.TryRemove(entityId, out _);
+                ReportedEntityIdSensorECO2.TryRemove(entityId, out _);
             }
         }
     }
@@ -201,12 +218,17 @@ internal sealed class ElectroluxWebSocketHandler(
     private async Task ReportClimate(System.Net.WebSockets.WebSocket socket,
         string wsId,
         ApplianceState applianceState,
-        string entityId,
+        HashSet<SubscribedEntity> subscribedEntities,
         CancellationToken cancellationToken)
     {
-        var reportedState = ReportedEntityIdStates.GetValueOrDefault(entityId, ClimateState.Unknown);
+        // There is always only one climate entity per appliance, so using FirstOrDefault is fine here
+        var climateEntity = subscribedEntities.FirstOrDefault(static x => x.EntityType == EntityType.Climate);
+        if (climateEntity is null)
+            return;
+
+        var reportedState = ReportedEntityIdStates.GetValueOrDefault(climateEntity.EntityId, ClimateState.Unknown);
         var currentState = GetClimateState(applianceState.Properties.Reported.WorkMode);
-        var reportedTemperature = ReportedEntityIdTemperature.GetValueOrDefault(entityId, (short)0);
+        var reportedTemperature = ReportedEntityIdTemperature.GetValueOrDefault(climateEntity.EntityId, (short)0);
         var currentTemperature = applianceState.Properties.Reported.Temperature;
         ClimateState? stateToReport = currentState != reportedState ? currentState : null;
         short? temperatureToReport = currentTemperature != reportedTemperature ? currentTemperature : null;
@@ -219,21 +241,25 @@ internal sealed class ElectroluxWebSocketHandler(
                         State = stateToReport,
                         CurrentTemperature = temperatureToReport
                     },
-                    entityId),
+                    climateEntity.EntityId),
                 wsId,
                 cancellationToken);
-            ReportedEntityIdStates[entityId] = currentState;
-            ReportedEntityIdTemperature[entityId] = currentTemperature;
+            ReportedEntityIdStates[climateEntity.EntityId] = currentState;
+            ReportedEntityIdTemperature[climateEntity.EntityId] = currentTemperature;
         }
     }
 
     private async Task ReportSelect(System.Net.WebSockets.WebSocket socket,
         string wsId,
         ApplianceState applianceState,
-        string entityId,
+        HashSet<SubscribedEntity> subscribedEntities,
         CancellationToken cancellationToken)
     {
-        var reportedSelect = ReportedEntityIdSelect.GetValueOrDefault(entityId, (sbyte)0);
+        // There is always only one select entity per appliance, so using FirstOrDefault is fine here
+        var selectEntity = subscribedEntities.FirstOrDefault(static x => x.EntityType == EntityType.Select);
+        if (selectEntity is null)
+            return;
+        var reportedSelect = ReportedEntityIdSelect.GetValueOrDefault(selectEntity.EntityId, (sbyte)0);
         if (reportedSelect == 0 || applianceState.Properties.Reported.FanSpeed != reportedSelect)
         {
             var currentSelect = applianceState.Properties.Reported.FanSpeed;
@@ -244,12 +270,252 @@ internal sealed class ElectroluxWebSocketHandler(
                         CurrentOption = currentSelect.ToString(NumberFormatInfo.InvariantInfo),
                         Options = null
                     },
-                    entityId,
+                    selectEntity.EntityId,
                     ElectroluxServerConstants.SelectSuffix),
                 wsId,
                 cancellationToken);
-            ReportedEntityIdSelect[entityId] = currentSelect;
+            ReportedEntityIdSelect[selectEntity.EntityId] = currentSelect;
         }
+    }
+
+    private Task ReportSensors(System.Net.WebSockets.WebSocket socket,
+        string wsId,
+        ApplianceState? applianceState,
+        HashSet<SubscribedEntity> subscribedEntities,
+        CancellationToken cancellationToken)
+    {
+        var tasks = (subscribedEntities.Where(static x => x.EntityType == EntityType.Sensor)
+            .Select(subscribedEntity => subscribedEntity switch
+            {
+                _ when subscribedEntity.EntityId.EndsWith(ElectroluxServerConstants.TemperatureSuffix, StringComparison.OrdinalIgnoreCase) => SendTemperatureSensor(socket, wsId, subscribedEntity.EntityId, applianceState, cancellationToken),
+                _ when subscribedEntity.EntityId.EndsWith(ElectroluxServerConstants.HumiditySuffix, StringComparison.OrdinalIgnoreCase) => SendHumiditySensor(socket, wsId, subscribedEntity.EntityId, applianceState, cancellationToken),
+                _ when subscribedEntity.EntityId.EndsWith(ElectroluxServerConstants.TVOCSuffix, StringComparison.OrdinalIgnoreCase) => SendTVOCSensor(socket, wsId, subscribedEntity.EntityId, applianceState, cancellationToken),
+                _ when subscribedEntity.EntityId.EndsWith(ElectroluxServerConstants.ECO2Suffix, StringComparison.OrdinalIgnoreCase) => SendECO2Sensor(socket, wsId, subscribedEntity.EntityId, applianceState, cancellationToken),
+                _ when subscribedEntity.EntityId.EndsWith(ElectroluxServerConstants.CO2Suffix, StringComparison.OrdinalIgnoreCase) => SendCO2Sensor(socket, wsId, subscribedEntity.EntityId, applianceState, cancellationToken),
+                _ when subscribedEntity.EntityId.EndsWith(ElectroluxServerConstants.PM1Suffix, StringComparison.OrdinalIgnoreCase) => SendPM1Sensor(socket, wsId, subscribedEntity.EntityId, applianceState, cancellationToken),
+                _ when subscribedEntity.EntityId.EndsWith(ElectroluxServerConstants.PM25Suffix, StringComparison.OrdinalIgnoreCase) => SendPM25Sensor(socket, wsId, subscribedEntity.EntityId, applianceState, cancellationToken),
+                _ when subscribedEntity.EntityId.EndsWith(ElectroluxServerConstants.PM10Suffix, StringComparison.OrdinalIgnoreCase) => SendPM10Sensor(socket, wsId, subscribedEntity.EntityId, applianceState, cancellationToken),
+                _ => Task.CompletedTask
+            }));
+
+        return Task.WhenAll(tasks);
+    }
+
+    private Task SendTemperatureSensor(System.Net.WebSockets.WebSocket socket, string wsId, string entityId, ApplianceState? applianceState, CancellationToken cancellationToken)
+    {
+        if (ReportedEntityIdSensorTemperature.TryGetValue(entityId, out var previousState) &&
+            previousState == applianceState?.Properties.Reported.Temperature)
+            return Task.CompletedTask;
+
+        ReportedEntityIdSensorTemperature[entityId] = applianceState?.Properties.Reported.Temperature;
+        if (applianceState == null)
+        {
+            return SendMessageAsync(socket,
+                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                    new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
+                    entityId,
+                    ElectroluxServerConstants.TemperatureSuffix),
+                wsId,
+                cancellationToken);
+        }
+        return SendMessageAsync(socket,
+            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                new SensorStateChangedEventMessageDataAttributes<int>
+                {
+                    State = SensorState.On,
+                    Value = applianceState.Properties.Reported.Temperature
+                },
+                entityId,
+                ElectroluxServerConstants.TemperatureSuffix),
+            wsId,
+            cancellationToken);
+    }
+
+    private Task SendHumiditySensor(System.Net.WebSockets.WebSocket socket, string wsId, string entityId, ApplianceState? applianceState, CancellationToken cancellationToken)
+    {
+        if (ReportedEntityIdSensorHumidity.TryGetValue(entityId, out var previousState) &&
+            previousState == applianceState?.Properties.Reported.Humidity)
+            return Task.CompletedTask;
+
+        ReportedEntityIdSensorHumidity[entityId] = applianceState?.Properties.Reported.Humidity;
+        if (applianceState == null)
+        {
+            return SendMessageAsync(socket,
+                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                    new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
+                    entityId,
+                    ElectroluxServerConstants.HumiditySuffix),
+                wsId,
+                cancellationToken);
+        }
+        return SendMessageAsync(socket,
+            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                new SensorStateChangedEventMessageDataAttributes<int>
+                {
+                    State = SensorState.On,
+                    Value = applianceState.Properties.Reported.Humidity,
+                    Unit = "%"
+                },
+                entityId,
+                ElectroluxServerConstants.HumiditySuffix),
+            wsId,
+            cancellationToken);
+    }
+
+    private Task SendTVOCSensor(System.Net.WebSockets.WebSocket socket, string wsId, string entityId, ApplianceState? applianceState, CancellationToken cancellationToken)
+    {
+        if (ReportedEntityIdSensorTVOC.TryGetValue(entityId, out var previousState) &&
+            previousState == applianceState?.Properties.Reported.TVOC)
+            return Task.CompletedTask;
+
+        ReportedEntityIdSensorTVOC[entityId] = applianceState?.Properties.Reported.TVOC;
+        if (applianceState == null)
+        {
+            return SendMessageAsync(socket,
+                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                    new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
+                    entityId,
+                    ElectroluxServerConstants.TVOCSuffix),
+                wsId,
+                cancellationToken);
+        }
+        return SendMessageAsync(socket,
+            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                new SensorStateChangedEventMessageDataAttributes<double> { State = SensorState.On, Value = applianceState.Properties.Reported.TVOC },
+                entityId,
+                ElectroluxServerConstants.TVOCSuffix),
+            wsId,
+            cancellationToken);
+    }
+
+    private Task SendCO2Sensor(System.Net.WebSockets.WebSocket socket, string wsId, string entityId, ApplianceState? applianceState, CancellationToken cancellationToken)
+    {
+        if (ReportedEntityIdSensorCO2.TryGetValue(entityId, out var previousState) &&
+            previousState == applianceState?.Properties.Reported.CO2)
+            return Task.CompletedTask;
+
+        ReportedEntityIdSensorCO2[entityId] = applianceState?.Properties.Reported.CO2;
+        if (applianceState == null)
+        {
+            return SendMessageAsync(socket,
+                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                    new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
+                    entityId,
+                    ElectroluxServerConstants.CO2Suffix),
+                wsId,
+                cancellationToken);
+        }
+        return SendMessageAsync(socket,
+                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                    new SensorStateChangedEventMessageDataAttributes<double> { State = SensorState.On, Value = applianceState.Properties.Reported.CO2 },
+                    entityId,
+                    ElectroluxServerConstants.CO2Suffix),
+                wsId,
+                cancellationToken);
+    }
+
+    private Task SendPM1Sensor(System.Net.WebSockets.WebSocket socket, string wsId, string entityId, ApplianceState? applianceState, CancellationToken cancellationToken)
+    {
+        if (ReportedEntityIdSensorPM1.TryGetValue(entityId, out var previousState) &&
+            previousState == applianceState?.Properties.Reported.PM1)
+            return Task.CompletedTask;
+
+        ReportedEntityIdSensorPM1[entityId] = applianceState?.Properties.Reported.PM1;
+        if (applianceState == null)
+        {
+            return SendMessageAsync(socket,
+                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                    new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
+                    entityId,
+                    ElectroluxServerConstants.PM1Suffix),
+                wsId,
+                cancellationToken);
+        }
+        return SendMessageAsync(socket,
+            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                new SensorStateChangedEventMessageDataAttributes<double> { State = SensorState.On, Value = applianceState.Properties.Reported.PM1 },
+                entityId,
+                ElectroluxServerConstants.PM1Suffix),
+            wsId,
+            cancellationToken);
+    }
+
+    private Task SendPM25Sensor(System.Net.WebSockets.WebSocket socket, string wsId, string entityId, ApplianceState? applianceState, CancellationToken cancellationToken)
+    {
+        if (ReportedEntityIdSensorPM25.TryGetValue(entityId, out var previousState) &&
+            previousState == applianceState?.Properties.Reported.PM25)
+            return Task.CompletedTask;
+
+        ReportedEntityIdSensorPM25[entityId] = applianceState?.Properties.Reported.PM25;
+        if (applianceState == null)
+        {
+            return SendMessageAsync(socket,
+                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                    new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
+                    entityId,
+                    ElectroluxServerConstants.PM25Suffix),
+                wsId,
+                cancellationToken);
+        }
+        return SendMessageAsync(socket,
+            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                new SensorStateChangedEventMessageDataAttributes<double> { State = SensorState.On, Value = applianceState.Properties.Reported.PM25 },
+                entityId,
+                ElectroluxServerConstants.PM25Suffix),
+            wsId,
+            cancellationToken);
+    }
+
+    private Task SendPM10Sensor(System.Net.WebSockets.WebSocket socket, string wsId, string entityId, ApplianceState? applianceState, CancellationToken cancellationToken)
+    {
+        if (ReportedEntityIdSensorPM10.TryGetValue(entityId, out var previousState) &&
+            previousState == applianceState?.Properties.Reported.PM10)
+            return Task.CompletedTask;
+
+        ReportedEntityIdSensorPM10[entityId] = applianceState?.Properties.Reported.PM10;
+        if (applianceState == null)
+        {
+            return SendMessageAsync(socket,
+                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                    new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
+                    entityId,
+                    ElectroluxServerConstants.PM10Suffix),
+                wsId,
+                cancellationToken);
+        }
+        return SendMessageAsync(socket,
+            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                new SensorStateChangedEventMessageDataAttributes<double> { State = SensorState.On, Value = applianceState.Properties.Reported.PM10 },
+                entityId,
+                ElectroluxServerConstants.PM10Suffix),
+            wsId,
+            cancellationToken);
+    }
+
+    private Task SendECO2Sensor(System.Net.WebSockets.WebSocket socket, string wsId, string entityId, ApplianceState? applianceState, CancellationToken cancellationToken)
+    {
+        if (ReportedEntityIdSensorECO2.TryGetValue(entityId, out var previousState) &&
+            previousState == applianceState?.Properties.Reported.ECO2)
+            return Task.CompletedTask;
+
+        ReportedEntityIdSensorECO2[entityId] = applianceState?.Properties.Reported.ECO2;
+        if (applianceState == null)
+        {
+            return SendMessageAsync(socket,
+                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                    new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
+                    entityId,
+                    ElectroluxServerConstants.ECO2Suffix),
+                wsId,
+                cancellationToken);
+        }
+        return SendMessageAsync(socket,
+            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                new SensorStateChangedEventMessageDataAttributes<double> { State = SensorState.On, Value = applianceState.Properties.Reported.ECO2 },
+                entityId,
+                ElectroluxServerConstants.ECO2Suffix),
+            wsId,
+            cancellationToken);
     }
 
     private static ClimateState GetClimateState(WorkMode workMode)
@@ -308,6 +574,70 @@ internal sealed class ElectroluxWebSocketHandler(
                 EntityType = EntityType.Select,
                 Name = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["en"] = $"{configurationItem.EntityName} Fan Speed" }
             };
+            yield return new SensorAvailableEntity
+            {
+                DeviceClass = DeviceClass.Temperature,
+                EntityId = configurationItem.EntityId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.TemperatureSuffix),
+                EntityType = EntityType.Sensor,
+                Name = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["en"] = $"{configurationItem.EntityName} Temperature" },
+                Options = new SensorOptions { CustomUnit = "°C", Decimals = 0 }
+            };
+            yield return new SensorAvailableEntity
+            {
+                DeviceClass = DeviceClass.Humidity,
+                EntityId = configurationItem.EntityId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.HumiditySuffix),
+                EntityType = EntityType.Sensor,
+                Name = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["en"] = $"{configurationItem.EntityName} Humidity" },
+                Options = new SensorOptions { CustomUnit = "%", Decimals = 0 }
+            };
+            yield return new SensorAvailableEntity
+            {
+                DeviceClass = DeviceClass.Custom,
+                EntityId = configurationItem.EntityId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.TVOCSuffix),
+                EntityType = EntityType.Sensor,
+                Name = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["en"] = $"{configurationItem.EntityName} TVOC" },
+                Options = new SensorOptions { Decimals = 0 }
+            };
+            yield return new SensorAvailableEntity
+            {
+                DeviceClass = DeviceClass.Custom,
+                EntityId = configurationItem.EntityId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.CO2Suffix),
+                EntityType = EntityType.Sensor,
+                Name = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["en"] = $"{configurationItem.EntityName} CO2" },
+                Options = new SensorOptions { Decimals = 0 }
+            };
+            yield return new SensorAvailableEntity
+            {
+                DeviceClass = DeviceClass.Custom,
+                EntityId = configurationItem.EntityId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.PM1Suffix),
+                EntityType = EntityType.Sensor,
+                Name = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["en"] = $"{configurationItem.EntityName} PM1" },
+                Options = new SensorOptions { CustomUnit = "PPM", Decimals = 0 }
+            };
+            yield return new SensorAvailableEntity
+            {
+                DeviceClass = DeviceClass.Custom,
+                EntityId = configurationItem.EntityId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.PM25Suffix),
+                EntityType = EntityType.Sensor,
+                Name = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["en"] = $"{configurationItem.EntityName} PM2.5" },
+                Options = new SensorOptions { CustomUnit = "PPM", Decimals = 0 }
+            };
+            yield return new SensorAvailableEntity
+            {
+                DeviceClass = DeviceClass.Custom,
+                EntityId = configurationItem.EntityId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.PM10Suffix),
+                EntityType = EntityType.Sensor,
+                Name = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["en"] = $"{configurationItem.EntityName} PM10" },
+                Options = new SensorOptions { CustomUnit = "PPM", Decimals = 0 }
+            };
+            yield return new SensorAvailableEntity
+            {
+                DeviceClass = DeviceClass.Custom,
+                EntityId = configurationItem.EntityId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.ECO2Suffix),
+                EntityType = EntityType.Sensor,
+                Name = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["en"] = $"{configurationItem.EntityName} ECO2" },
+                Options = new SensorOptions { Decimals = 0 }
+            };
         }
     }
 
@@ -323,9 +653,10 @@ internal sealed class ElectroluxWebSocketHandler(
         var responseCache = new Dictionary<string, ApplianceState?>(StringComparer.OrdinalIgnoreCase);
         foreach (string msgDataEntityId in payload.MsgData.EntityIds)
         {
+            cancellationTokenWrapper.AddSubscribedEntity(msgDataEntityId);
             var baseEntityId = msgDataEntityId.GetBaseIdentifier();
             var entityType = msgDataEntityId.GetEntityTypeFromIdentifier();
-            if (!responseCache.TryGetValue(baseEntityId, out ApplianceState? applianceState))
+            if (!responseCache.TryGetValue(baseEntityId, out var applianceState))
             {
                 applianceState = await _electroluxClient.GetApplianceStateAsync(baseEntityId, commandCancellationToken);
                 responseCache[baseEntityId] = applianceState;
@@ -359,6 +690,9 @@ internal sealed class ElectroluxWebSocketHandler(
                             ElectroluxServerConstants.SelectSuffix),
                         wsId,
                         commandCancellationToken);
+                    break;
+                case EntityType.Sensor:
+                    await ReportSensors(socket, wsId, applianceState, [new SubscribedEntity(msgDataEntityId, EntityType.Sensor)], commandCancellationToken);
                     break;
             }
         }
@@ -480,5 +814,10 @@ internal sealed class ElectroluxWebSocketHandler(
         };
     }
 
-    protected override FrozenSet<EntityType> SupportedEntityTypes { get; } = [EntityType.Climate, EntityType.Select];
+    protected override FrozenSet<EntityType> SupportedEntityTypes { get; } =
+    [
+        EntityType.Climate,
+        EntityType.Select,
+        EntityType.Sensor
+    ];
 }
