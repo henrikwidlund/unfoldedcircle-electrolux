@@ -29,7 +29,7 @@ internal static class ElectroluxResponsePayloadHelpers
             yield return new SensorEntityStateChanged
             {
                 EntityId = appliance.ApplianceId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.TemperatureSuffix),
-                EntityType = EntityType.Select,
+                EntityType = EntityType.Sensor,
                 Attributes = SensorAttributes
             };
             yield return new SensorEntityStateChanged
@@ -40,37 +40,37 @@ internal static class ElectroluxResponsePayloadHelpers
             };
             yield return new SensorEntityStateChanged
             {
-                EntityId = appliance.ApplianceId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.TVOCSuffix),
+                EntityId = appliance.ApplianceId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.TvocSuffix),
                 EntityType = EntityType.Sensor,
                 Attributes = SensorAttributes
             };
             yield return new SensorEntityStateChanged
             {
-                EntityId = appliance.ApplianceId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.CO2Suffix),
+                EntityId = appliance.ApplianceId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.Co2Suffix),
                 EntityType = EntityType.Sensor,
                 Attributes = SensorAttributes
             };
             yield return new SensorEntityStateChanged
             {
-                EntityId = appliance.ApplianceId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.PM1Suffix),
+                EntityId = appliance.ApplianceId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.Pm1Suffix),
                 EntityType = EntityType.Sensor,
                 Attributes = SensorAttributes
             };
             yield return new SensorEntityStateChanged
             {
-                EntityId = appliance.ApplianceId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.PM25Suffix),
+                EntityId = appliance.ApplianceId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.Pm25Suffix),
                 EntityType = EntityType.Sensor,
                 Attributes = SensorAttributes
             };
             yield return new SensorEntityStateChanged
             {
-                EntityId = appliance.ApplianceId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.PM10Suffix),
+                EntityId = appliance.ApplianceId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.Pm10Suffix),
                 EntityType = EntityType.Sensor,
                 Attributes = SensorAttributes
             };
             yield return new SensorEntityStateChanged
             {
-                EntityId = appliance.ApplianceId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.ECO2Suffix),
+                EntityId = appliance.ApplianceId.GetIdentifier(EntityType.Sensor, ElectroluxServerConstants.Eco2Suffix),
                 EntityType = EntityType.Sensor,
                 Attributes = SensorAttributes
             };
