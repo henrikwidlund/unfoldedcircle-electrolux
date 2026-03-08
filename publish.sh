@@ -51,13 +51,6 @@ cp ./*.pdb ./driverdir/bin/ 2>/dev/null || true
 # Set permissions
 chmod 755 ./driverdir/bin/driver
 chmod 755 ./driverdir/bin/app
-chmod 755 ./driverdir/bin/certs
-chmod 644 ./driverdir/bin/certs/*
-
-if [ -d "./driverdir/bin/openssl" ]; then
-  chmod 755 ./driverdir/bin/openssl
-  chmod 644 ./driverdir/bin/openssl/*
-fi
 
 # Package the driver directory into a tarball
 cd ./driverdir || exit
