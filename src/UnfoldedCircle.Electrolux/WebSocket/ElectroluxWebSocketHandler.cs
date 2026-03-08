@@ -164,7 +164,6 @@ internal sealed class ElectroluxWebSocketHandler(
 
     protected override async Task HandleEventUpdatesAsync(System.Net.WebSockets.WebSocket socket, string wsId, SubscribedEntitiesHolder subscribedEntitiesHolder, CancellationToken cancellationToken)
     {
-        await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
         using var periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(25));
         try
         {
