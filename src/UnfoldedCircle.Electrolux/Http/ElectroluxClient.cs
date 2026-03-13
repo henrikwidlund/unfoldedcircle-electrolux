@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Net.ServerSentEvents;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 using Theodicean.SourceGenerators;
 
@@ -236,11 +237,17 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
 
     private static readonly EmptyStreamEvent EmptyStreamEvent = new();
 
-    public static async IAsyncEnumerable<LiveStreamEvent> GetLiveStreamEventsAsync(Stream stream,
+    public async IAsyncEnumerable<LiveStreamEvent> GetLiveStreamEventsAsync(Stream stream,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await foreach (var item in SseParser.Create<EmptyStreamEvent>(stream, static (_, data)
-                           => JsonSerializer.Deserialize<EmptyStreamEvent>(data, ElectroluxJsonSerializerContext.Default.EmptyStreamEvent) ?? EmptyStreamEvent)
+        await foreach (var item in SseParser.Create<EmptyStreamEvent>(stream, (_, data)
+                           =>
+                           {
+                               if (_logger.IsEnabled(LogLevel.Trace))
+                                   _logger.LogTrace("Received live stream event data: {Data}", Encoding.UTF8.GetString(data));
+
+                               return JsonSerializer.Deserialize<EmptyStreamEvent>(data, ElectroluxJsonSerializerContext.Default.EmptyStreamEvent) ?? EmptyStreamEvent;
+                           })
                            .EnumerateAsync(cancellationToken))
         {
             if (item.Data is not LiveStreamEvent data)

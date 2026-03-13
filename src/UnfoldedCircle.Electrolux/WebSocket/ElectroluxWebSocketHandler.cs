@@ -167,7 +167,7 @@ internal sealed class ElectroluxWebSocketHandler(
                 }
 
                 await using var stream = await liveStream.GetStreamAsync(cancellationToken);
-                await foreach (var liveStreamEvent in ElectroluxClient.GetLiveStreamEventsAsync(stream, cancellationToken))
+                await foreach (var liveStreamEvent in _electroluxClient.GetLiveStreamEventsAsync(stream, cancellationToken))
                 {
                     if (subscribedEntitiesHolder.SubscribedEntities.TryGetValue(liveStreamEvent.ApplianceId, out var subscribedEntities))
                         await HandleElectroluxEvent(socket, wsId, subscribedEntities, liveStreamEvent, cancellationToken);
