@@ -279,12 +279,17 @@ internal sealed class ElectroluxWebSocketHandler(
         {
             return SendMessageAsync(socket,
                 ResponsePayloadHelpers.CreateSelectStateChangedResponsePayload(
-                    new SelectStateChangedEventMessageDataAttributes { State = SelectState.Unknown },
+                    new SelectStateChangedEventMessageDataAttributes
+                    {
+                        State = SelectState.Unknown,
+                        CurrentOption = null
+                    },
                     entityId,
                     ElectroluxServerConstants.SelectSuffix),
                 wsId,
                 cancellationToken);
         }
+        EntityIdSelectedOption[entityId] = fanSpeed.Value.ToString(NumberFormatInfo.InvariantInfo);
         return SendMessageAsync(socket,
             ResponsePayloadHelpers.CreateSelectStateChangedResponsePayload(
                 new SelectStateChangedEventMessageDataAttributes
