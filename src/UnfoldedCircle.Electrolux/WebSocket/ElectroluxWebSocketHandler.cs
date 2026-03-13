@@ -162,7 +162,9 @@ internal sealed class ElectroluxWebSocketHandler(
                 if (liveStream is null)
                 {
                     _logger.FailedToGetLiveStream(wsId);
-                    return;
+                    // treat null livestream as transient: wait a bit before trying again
+                    await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+                    continue;
                 }
 
                 await using var stream = await liveStream.GetStreamAsync(cancellationToken);
@@ -173,6 +175,11 @@ internal sealed class ElectroluxWebSocketHandler(
                         await HandleElectroluxEvent(socket, wsId, subscribedEntities, liveStreamEvent, cancellationToken);
                     }
                 }
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                // Normal shutdown: cancellation requested, exit without logging an error or delaying.
+                return;
             }
             catch (Exception e)
             {
