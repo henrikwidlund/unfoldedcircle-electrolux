@@ -18,7 +18,19 @@ internal static partial class IntegrationLogger
     public static void FailureDuringEvent(this ILogger logger, Exception exception, string wsId, string key) =>
         FailureDuringEventAction(logger, wsId, key, exception);
 
-    [LoggerMessage(EventId = 4, EventName = nameof(CouldNotGetApplianceState), Level = LogLevel.Information,
-        Message = "[{WSId}] Could not get appliance state for entity ID '{EntityId}'")]
-    public static partial void CouldNotGetApplianceState(this ILogger logger, string wsId, string entityId);
+    private static readonly Action<ILogger, Exception> FailureGetLiveStreamAction = LoggerMessage.Define(
+        LogLevel.Error,
+        new EventId(4, nameof(FailureGetLiveStream)),
+        "Failure to get live stream.");
+
+    public static void FailureGetLiveStream(this ILogger logger, Exception exception) =>
+        FailureGetLiveStreamAction(logger, exception);
+
+    private static readonly Action<ILogger, string, Exception> FailureDuringBroadcastAction = LoggerMessage.Define<string>(
+        LogLevel.Error,
+        new EventId(5, nameof(FailureDuringBroadcast)),
+        "[{WSId}] Failure during live stream broadcast.");
+
+    public static void FailureDuringBroadcast(this ILogger logger, Exception exception, string wsId) =>
+        FailureDuringBroadcastAction(logger, wsId, exception);
 }
