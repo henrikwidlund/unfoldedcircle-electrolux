@@ -239,7 +239,7 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
     public static async IAsyncEnumerable<LiveStreamEvent> GetLiveStreamEventsAsync(Stream stream,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await foreach (var item in SseParser.Create<EmptyStreamEvent>(stream, static (type, data)
+        await foreach (var item in SseParser.Create<EmptyStreamEvent>(stream, static (_, data)
                            => JsonSerializer.Deserialize<EmptyStreamEvent>(data, ElectroluxJsonSerializerContext.Default.EmptyStreamEvent) ?? EmptyStreamEvent)
                            .EnumerateAsync(cancellationToken))
         {
