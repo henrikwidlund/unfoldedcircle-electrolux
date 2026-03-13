@@ -162,7 +162,8 @@ internal sealed class ElectroluxWebSocketHandler(
                 if (liveStream is null)
                 {
                     // treat null livestream as transient: wait a bit before trying again
-                    await SafeDelayAsync(TimeSpan.FromSeconds(10), cancellationToken);
+                    _logger.LogInformation("Live stream was null, retrying after delay. WebSocket ID: {WebSocketId}", wsId);
+                    await SafeDelayAsync(TimeSpan.FromSeconds(1), cancellationToken);
                     continue;
                 }
 
@@ -174,7 +175,8 @@ internal sealed class ElectroluxWebSocketHandler(
                 }
 
                 // If the live stream ends cleanly without throwing, wait briefly before reconnecting
-                await SafeDelayAsync(TimeSpan.FromSeconds(10), cancellationToken);
+                _logger.LogInformation("Live stream ended, reconnecting after delay. WebSocket ID: {WebSocketId}", wsId);
+                await SafeDelayAsync(TimeSpan.FromSeconds(1), cancellationToken);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -184,7 +186,7 @@ internal sealed class ElectroluxWebSocketHandler(
             catch (Exception e)
             {
                 _logger.FailureDuringBroadcast(e, wsId);
-                await SafeDelayAsync(TimeSpan.FromSeconds(10), cancellationToken);
+                await SafeDelayAsync(TimeSpan.FromSeconds(1), cancellationToken);
             }
             finally
             {

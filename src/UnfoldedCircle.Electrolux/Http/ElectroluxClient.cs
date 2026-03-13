@@ -240,11 +240,11 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
     public async IAsyncEnumerable<LiveStreamEvent> GetLiveStreamEventsAsync(Stream stream,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await foreach (var item in SseParser.Create<EmptyStreamEvent>(stream, (_, data)
+        await foreach (var item in SseParser.Create<EmptyStreamEvent>(stream, (type, data)
                            =>
                            {
                                if (_logger.IsEnabled(LogLevel.Trace))
-                                   _logger.LogTrace("Received live stream event data: {Data}", Encoding.UTF8.GetString(data));
+                                   _logger.LogTrace("Received live stream event {type}: {Data}", type, Encoding.UTF8.GetString(data));
 
                                return JsonSerializer.Deserialize<EmptyStreamEvent>(data, ElectroluxJsonSerializerContext.Default.EmptyStreamEvent) ?? EmptyStreamEvent;
                            })
