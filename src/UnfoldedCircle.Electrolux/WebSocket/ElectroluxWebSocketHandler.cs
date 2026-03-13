@@ -161,7 +161,6 @@ internal sealed class ElectroluxWebSocketHandler(
                 using var liveStream = await _electroluxClient.GetLiveStreamAsync(cancellationToken);
                 if (liveStream is null)
                 {
-                    _logger.FailedToGetLiveStream(wsId);
                     // treat null livestream as transient: wait a bit before trying again
                     await SafeDelayAsync(TimeSpan.FromSeconds(10), cancellationToken);
                     continue;

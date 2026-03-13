@@ -18,13 +18,9 @@ internal static partial class IntegrationLogger
     public static void FailureDuringEvent(this ILogger logger, Exception exception, string wsId, string key) =>
         FailureDuringEventAction(logger, wsId, key, exception);
 
-    [LoggerMessage(EventId = 4, EventName = nameof(FailedToGetLiveStream), Level = LogLevel.Error,
-        Message = "[{WSId}] Failed to get live stream")]
-    public static partial void FailedToGetLiveStream(this ILogger logger, string wsId);
-
     private static readonly Action<ILogger, Exception> FailureGetLiveStreamAction = LoggerMessage.Define(
         LogLevel.Error,
-        new EventId(5, nameof(FailureGetLiveStream)),
+        new EventId(4, nameof(FailureGetLiveStream)),
         "Failure to get live stream.");
 
     public static void FailureGetLiveStream(this ILogger logger, Exception exception) =>
@@ -32,7 +28,7 @@ internal static partial class IntegrationLogger
 
     private static readonly Action<ILogger, string, Exception> FailureDuringBroadcastAction = LoggerMessage.Define<string>(
         LogLevel.Error,
-        new EventId(6, nameof(FailureDuringBroadcast)),
+        new EventId(5, nameof(FailureDuringBroadcast)),
         "[{WSId}] Failure during live stream broadcast.");
 
     public static void FailureDuringBroadcast(this ILogger logger, Exception exception, string wsId) =>

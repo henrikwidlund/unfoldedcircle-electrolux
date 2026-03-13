@@ -420,7 +420,7 @@ file static class JsonValidationExtensions
         public void ValidateHasValue([CallerMemberName]string? memberName = null)
         {
             if (val is null)
-                throw new JsonException($"{memberName} should not be null.");
+                throw new JsonException($"{memberName} should not be null or empty.");
         }
     }
 }
