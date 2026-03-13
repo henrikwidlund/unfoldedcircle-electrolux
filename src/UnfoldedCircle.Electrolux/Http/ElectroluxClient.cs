@@ -208,7 +208,7 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
         request.Headers.Authorization = authorizationHeader;
         request.Headers.Add(ApiKeyHeader, tokenResult.ApiKey);
 
-        var response = await HttpClient.SendAsync(request, cancellationToken);
+        using var response = await HttpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
 
         var liveStreamResponse = await response.Content.ReadFromJsonAsync<LiveStreamResponse>(ElectroluxJsonSerializerContext.Default.LiveStreamResponse, cancellationToken);

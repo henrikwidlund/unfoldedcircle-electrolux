@@ -29,4 +29,12 @@ internal static partial class IntegrationLogger
 
     public static void FailureGetLiveStream(this ILogger logger, Exception exception) =>
         FailureGetLiveStreamAction(logger, exception);
+
+    private static readonly Action<ILogger, string, Exception> FailureDuringBroadcastAction = LoggerMessage.Define<string>(
+        LogLevel.Error,
+        new EventId(6, nameof(FailureDuringBroadcast)),
+        "[{WSId}] Failure to get live stream.");
+
+    public static void FailureDuringBroadcast(this ILogger logger, Exception exception, string wsId) =>
+        FailureDuringBroadcastAction(logger, wsId, exception);
 }

@@ -154,19 +154,31 @@ internal sealed class ElectroluxWebSocketHandler(
 
     protected override async Task HandleEventUpdatesAsync(System.Net.WebSockets.WebSocket socket, string wsId, SubscribedEntitiesHolder subscribedEntitiesHolder, CancellationToken cancellationToken)
     {
-        using var liveStream = await _electroluxClient.GetLiveStreamAsync(cancellationToken);
-        if (liveStream is null)
+        while (!cancellationToken.IsCancellationRequested)
         {
-            _logger.FailedToGetLiveStream(wsId);
-            return;
-        }
-
-        await using var stream = await liveStream.GetStreamAsync(cancellationToken);
-        await foreach (var liveStreamEvent in ElectroluxClient.GetLiveStreamEventsAsync(stream, cancellationToken))
-        {
-            if (subscribedEntitiesHolder.SubscribedEntities.TryGetValue(liveStreamEvent.ApplianceId, out var subscribedEntities))
+            try
             {
-                await HandleElectroluxEvent(socket, wsId, subscribedEntities, liveStreamEvent, cancellationToken);
+                using var liveStream = await _electroluxClient.GetLiveStreamAsync(cancellationToken);
+                if (liveStream is null)
+                {
+                    _logger.FailedToGetLiveStream(wsId);
+                    return;
+                }
+
+                await using var stream = await liveStream.GetStreamAsync(cancellationToken);
+                await foreach (var liveStreamEvent in ElectroluxClient.GetLiveStreamEventsAsync(stream, cancellationToken))
+                {
+                    if (subscribedEntitiesHolder.SubscribedEntities.TryGetValue(liveStreamEvent.ApplianceId, out var subscribedEntities))
+                    {
+                        await HandleElectroluxEvent(socket, wsId, subscribedEntities, liveStreamEvent, cancellationToken);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.FailureDuringBroadcast(e, wsId);
+                // something went wrong during the live stream, wait a bit before trying again to avoid tight error loops
+                await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
             }
         }
     }
