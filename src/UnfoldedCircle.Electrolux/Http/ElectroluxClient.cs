@@ -240,7 +240,7 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
     public async IAsyncEnumerable<LiveStreamEvent> GetLiveStreamEventsAsync(Stream stream,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await foreach (var item in SseParser.Create<EmptyStreamEvent>(stream, (type, data)
+        await foreach (var item in SseParser.Create(stream, (type, data)
                            =>
                            {
                                if (_logger.IsEnabled(LogLevel.Trace))
