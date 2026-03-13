@@ -1,17 +1,20 @@
-
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
+using System.Net.ServerSentEvents;
 using System.Runtime.CompilerServices;
 
 using Theodicean.SourceGenerators;
 
 using UnfoldedCircle.Electrolux.Json;
+using UnfoldedCircle.Electrolux.Logging;
 
 namespace UnfoldedCircle.Electrolux.Http;
 
-public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConfiguration configuration)
+public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConfiguration configuration, ILogger<ElectroluxClient> logger)
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactoryFactory;
     private readonly IConfiguration _configuration = configuration;
+    private readonly ILogger<ElectroluxClient> _logger = logger;
     private HttpClient HttpClient => field ??= _httpClientFactory.CreateClient("ElectroluxClient");
     private TokenResult? _currentToken;
 
@@ -20,6 +23,7 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
     private const string ApiKeyHeader = "x-api-key";
     private const string NoValidTokenMessage = "No valid token available.";
     private const string ElectroluxAppliancesEndpoint = "Electrolux:AppliancesEndpoint";
+    private const string ElectroluxLiveStreamEndpoint = "Electrolux:LiveStreamEndpoint";
     private const string Bearer = nameof(Bearer);
 
     private string UcConfigHome => field ??= Path.Combine(_configuration["UC_CONFIG_HOME"] ?? string.Empty, "token.json");
@@ -192,6 +196,62 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
 
         return await response.Content.ReadFromJsonAsync<ApplianceState>(ElectroluxJsonSerializerContext.Default.ApplianceState, cancellationToken);
     }
+
+    public async Task<ElectroluxLiveStream?> GetLiveStreamAsync(CancellationToken cancellationToken)
+    {
+        var tokenResult = await GetTokenAsync(cancellationToken);
+        if (tokenResult == null)
+            throw new InvalidOperationException(NoValidTokenMessage);
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, _configuration[ElectroluxLiveStreamEndpoint]);
+        var authorizationHeader = new AuthenticationHeaderValue(Bearer, tokenResult.AccessToken);
+        request.Headers.Authorization = authorizationHeader;
+        request.Headers.Add(ApiKeyHeader, tokenResult.ApiKey);
+
+        var response = await HttpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        var liveStreamResponse = await response.Content.ReadFromJsonAsync<LiveStreamResponse>(ElectroluxJsonSerializerContext.Default.LiveStreamResponse, cancellationToken);
+        if (liveStreamResponse is null)
+            return null;
+
+        var httpRequest = new HttpRequestMessage(HttpMethod.Get, liveStreamResponse.Url);
+        httpRequest.Headers.Authorization = authorizationHeader;
+        httpRequest.Headers.Add(ApiKeyHeader, tokenResult.ApiKey);
+
+        HttpResponseMessage? httpResponse = null;
+        try
+        {
+            httpResponse = await HttpClient.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            httpResponse.EnsureSuccessStatusCode();
+            return new ElectroluxLiveStream(httpResponse);
+        }
+        catch (Exception e)
+        {
+            _logger.FailureGetLiveStream(e);
+            httpResponse?.Dispose();
+            return null;
+        }
+    }
+
+    private static readonly EmptyStreamEvent EmptyStreamEvent = new();
+
+    public static async IAsyncEnumerable<LiveStreamEvent> GetLiveStreamEventsAsync(Stream stream,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        await foreach (var item in SseParser.Create<EmptyStreamEvent>(stream, static (type, data) =>
+                       {
+                           if (!type.Equals("message", StringComparison.OrdinalIgnoreCase))
+                               return EmptyStreamEvent;
+                           return JsonSerializer.Deserialize<EmptyStreamEvent>(data, ElectroluxJsonSerializerContext.Default.EmptyStreamEvent) ?? EmptyStreamEvent;
+                       }).EnumerateAsync(cancellationToken))
+        {
+            if (item.Data is not LiveStreamEvent data)
+                continue;
+
+            yield return data;
+        }
+    }
 }
 
 public sealed record TokenResult(string? AccessToken, string RefreshToken, DateTimeOffset ExpiresAt, string ApiKey);
@@ -249,3 +309,124 @@ public sealed record ApplianceReportedProperty(
     [property: JsonPropertyName("PM10")] ushort Pm10,
     [property: JsonPropertyName("ECO2")] ushort Eco2
 );
+
+public sealed record LiveStreamResponse(
+    [property: JsonPropertyName("url")] Uri Url,
+    [property: JsonPropertyName("appliances")] LiveStreamAppliance[] Appliances);
+
+public sealed record LiveStreamAppliance(
+    [property: JsonPropertyName("applianceId")] string ApplianceId,
+    [property: JsonPropertyName("properties")] string[] Properties);
+
+[JsonDerivedType(typeof(LiveStreamEvent))]
+[JsonDerivedType(typeof(LiveStreamEvent<string>))]
+[JsonDerivedType(typeof(LiveStreamEvent<int>))]
+[JsonDerivedType(typeof(LiveStreamEvent<bool>))]
+[JsonConverter(typeof(EmptyStreamEventJsonConverter))]
+public record EmptyStreamEvent;
+
+public record LiveStreamEvent(
+    [property: JsonPropertyName("userId")] string UserId,
+    [property: JsonPropertyName("applianceId")] string ApplianceId,
+    [property: JsonPropertyName("property")] string Property
+): EmptyStreamEvent;
+
+public sealed record LiveStreamEvent<TValue>(
+    string UserId,
+    string ApplianceId,
+    string Property,
+    [property: JsonPropertyName("value")] TValue Value
+): LiveStreamEvent(UserId, ApplianceId, Property);
+
+internal class EmptyStreamEventJsonConverter : JsonConverter<EmptyStreamEvent>
+{
+    public override EmptyStreamEvent Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType != JsonTokenType.StartObject)
+            throw new JsonException("Expected start of JSON object.");
+
+        string? userId = null;
+        string ? applianceId = null;
+        string ? property = null;
+        int? intValue = null;
+        string? stringValue = null;
+        bool? boolValue = null;
+
+        while (reader.TokenType != JsonTokenType.EndObject && reader.Read())
+        {
+            if (reader.TokenType != JsonTokenType.PropertyName)
+                continue;
+
+            if (reader.ValueTextEquals("userId"u8))
+            {
+                reader.Read();
+                userId = reader.GetString();
+            }
+            else if (reader.ValueTextEquals("applianceId"u8))
+            {
+                reader.Read();
+                applianceId = reader.GetString();
+            }
+            else if (reader.ValueTextEquals("property"u8))
+            {
+                reader.Read();
+                property = reader.GetString();
+            }
+            else if (reader.ValueTextEquals("value"))
+            {
+                reader.Read();
+                switch (reader.TokenType)
+                {
+                    case JsonTokenType.String:
+                        stringValue = reader.GetString();
+                        break;
+                    case JsonTokenType.Number:
+                        if (reader.TryGetInt32(out var intResult))
+                            intValue = intResult;
+                        break;
+                    case JsonTokenType.True:
+                    case JsonTokenType.False:
+                        boolValue = reader.GetBoolean();
+                        break;
+                }
+            }
+        }
+
+        userId.ValidateHasValue();
+        applianceId.ValidateHasValue();
+        property.ValidateHasValue();
+
+        if (intValue.HasValue)
+            return new LiveStreamEvent<int>(userId, applianceId, property, intValue.Value);
+        if (boolValue.HasValue)
+            return new LiveStreamEvent<bool>(userId, applianceId, property, boolValue.Value);
+        if (stringValue is not null)
+            return new LiveStreamEvent<string>(userId, applianceId, property, stringValue);
+
+        throw new JsonException("value property is missing.");
+    }
+
+    public override void Write(Utf8JsonWriter writer, EmptyStreamEvent value, JsonSerializerOptions options) => throw new NotSupportedException();
+}
+
+file static class JsonValidationExtensions
+{
+    // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
+    extension([NotNull] string? val)
+    {
+        public void ValidateHasValue([CallerMemberName]string? memberName = null)
+        {
+            if (val is null)
+                throw new JsonException($"{memberName} should not be null.");
+        }
+    }
+}
+
+public sealed class ElectroluxLiveStream(HttpResponseMessage httpResponseMessage) : IDisposable
+{
+    private readonly HttpResponseMessage _httpResponseMessage = httpResponseMessage;
+
+    public Task<Stream> GetStreamAsync(CancellationToken cancellationToken) => _httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken);
+
+    public void Dispose() => _httpResponseMessage.Dispose();
+}
