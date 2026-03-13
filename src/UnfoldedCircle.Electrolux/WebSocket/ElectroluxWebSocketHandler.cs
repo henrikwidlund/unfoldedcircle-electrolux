@@ -173,6 +173,9 @@ internal sealed class ElectroluxWebSocketHandler(
                     if (subscribedEntitiesHolder.SubscribedEntities.TryGetValue(liveStreamEvent.ApplianceId, out var subscribedEntities))
                         await HandleElectroluxEvent(socket, wsId, subscribedEntities, liveStreamEvent, cancellationToken);
                 }
+
+                // If the live stream ends cleanly without throwing, wait briefly before reconnecting
+                await SafeDelayAsync(TimeSpan.FromSeconds(10), cancellationToken);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -184,7 +187,17 @@ internal sealed class ElectroluxWebSocketHandler(
                 _logger.FailureDuringBroadcast(e, wsId);
                 await SafeDelayAsync(TimeSpan.FromSeconds(10), cancellationToken);
             }
+            finally
+            {
+                ResetSelectOption(subscribedEntitiesHolder.SubscribedEntities.Values);
+            }
         }
+    }
+
+    private static void ResetSelectOption(IEnumerable<HashSet<SubscribedEntity>> subscribedEntities)
+    {
+        foreach (var selectEntity in subscribedEntities.SelectMany(static x => x).Where(static x => x.EntityType == EntityType.Select))
+            EntityIdSelectedOption.TryRemove(selectEntity.EntityId, out _);
     }
 
     private static async Task SafeDelayAsync(TimeSpan delay, CancellationToken cancellationToken)
@@ -277,6 +290,7 @@ internal sealed class ElectroluxWebSocketHandler(
 
         if (fanSpeed == null)
         {
+            EntityIdSelectedOption.TryRemove(entityId, out _);
             return SendMessageAsync(socket,
                 ResponsePayloadHelpers.CreateSelectStateChangedResponsePayload(
                     new SelectStateChangedEventMessageDataAttributes
