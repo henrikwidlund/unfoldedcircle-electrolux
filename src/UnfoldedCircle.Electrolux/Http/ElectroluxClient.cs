@@ -215,7 +215,7 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
         if (liveStreamResponse is null)
             return null;
 
-        var httpRequest = new HttpRequestMessage(HttpMethod.Get, liveStreamResponse.Url);
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Get, liveStreamResponse.Url);
         httpRequest.Headers.Authorization = authorizationHeader;
         httpRequest.Headers.Add(ApiKeyHeader, tokenResult.ApiKey);
 
@@ -239,12 +239,9 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
     public static async IAsyncEnumerable<LiveStreamEvent> GetLiveStreamEventsAsync(Stream stream,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await foreach (var item in SseParser.Create<EmptyStreamEvent>(stream, static (type, data) =>
-                       {
-                           if (!type.Equals("message", StringComparison.OrdinalIgnoreCase))
-                               return EmptyStreamEvent;
-                           return JsonSerializer.Deserialize<EmptyStreamEvent>(data, ElectroluxJsonSerializerContext.Default.EmptyStreamEvent) ?? EmptyStreamEvent;
-                       }).EnumerateAsync(cancellationToken))
+        await foreach (var item in SseParser.Create<EmptyStreamEvent>(stream, static (type, data)
+                           => JsonSerializer.Deserialize<EmptyStreamEvent>(data, ElectroluxJsonSerializerContext.Default.EmptyStreamEvent) ?? EmptyStreamEvent)
+                           .EnumerateAsync(cancellationToken))
         {
             if (item.Data is not LiveStreamEvent data)
                 continue;
@@ -338,8 +335,10 @@ public sealed record LiveStreamEvent<TValue>(
     [property: JsonPropertyName("value")] TValue Value
 ): LiveStreamEvent(UserId, ApplianceId, Property);
 
-internal class EmptyStreamEventJsonConverter : JsonConverter<EmptyStreamEvent>
+internal sealed class EmptyStreamEventJsonConverter : JsonConverter<EmptyStreamEvent>
 {
+    private static readonly EmptyStreamEvent EmptyStreamEvent = new();
+
     public override EmptyStreamEvent Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartObject)
@@ -392,7 +391,11 @@ internal class EmptyStreamEventJsonConverter : JsonConverter<EmptyStreamEvent>
             }
         }
 
-        userId.ValidateHasValue();
+        if (string.IsNullOrEmpty(userId))
+        {
+            // this never happens unless we get a ping event, in which case we will return an empty event so it can be ignored
+            return EmptyStreamEvent;
+        }
         applianceId.ValidateHasValue();
         property.ValidateHasValue();
 

@@ -174,7 +174,6 @@ internal sealed class ElectroluxWebSocketHandler(
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private Task HandleElectroluxEvent(System.Net.WebSockets.WebSocket socket, string wsId, HashSet<SubscribedEntity> subscribedEntities, LiveStreamEvent liveStreamEvent, CancellationToken cancellationToken)
     {
-        logger.LogInformation(liveStreamEvent.ToString());
         return liveStreamEvent.Property switch
         {
             "Workmode" => SendClimateAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x => x.EntityType == EntityType.Climate)?.EntityId,
@@ -254,7 +253,7 @@ internal sealed class ElectroluxWebSocketHandler(
                 ResponsePayloadHelpers.CreateSelectStateChangedResponsePayload(
                     new SelectStateChangedEventMessageDataAttributes { State = SelectState.Unknown },
                     entityId,
-                    ElectroluxServerConstants.TemperatureSuffix),
+                    ElectroluxServerConstants.SelectSuffix),
                 wsId,
                 cancellationToken);
         }

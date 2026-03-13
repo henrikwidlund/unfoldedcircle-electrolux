@@ -77100,8 +77100,8 @@
       "versionControlProvenance": [
         {
           "repositoryUri": "https://github.com/henrikwidlund/unfoldedcircle-electrolux.git",
-          "revisionId": "11690228c676d384cff93f213bf8f84db2b97e1d",
-          "branch": "feature/initial_implementation",
+          "revisionId": "a4dfeba88b9c8dcbff70496b470025fac83e9752",
+          "branch": "feature/live_stream_support",
           "properties": {
             "repoUrl": "https://github.com/henrikwidlund/unfoldedcircle-electrolux.git",
             "lastAuthorName": "Henrik Widlund",
@@ -77132,13 +77132,6 @@
             "uriBaseId": "solutionDir"
           },
           "hashes": {}
-        },
-        {
-          "location": {
-            "uri": "src/UnfoldedCircle.Electrolux/Logging/IntegrationLogger.cs",
-            "uriBaseId": "solutionDir"
-          },
-          "hashes": {}
         }
       ],
       "results": [
@@ -77158,22 +77151,22 @@
                   "uriBaseId": "solutionDir"
                 },
                 "region": {
-                  "startLine": 13,
+                  "startLine": 15,
                   "startColumn": 5,
-                  "endLine": 13,
+                  "endLine": 15,
                   "endColumn": 87,
-                  "charOffset": 301,
+                  "charOffset": 449,
                   "charLength": 82,
                   "snippet": {
                     "text": "private readonly IHttpClientFactory _httpClientFactory = httpClientFactoryFactory;"
                   }
                 },
                 "contextRegion": {
-                  "startLine": 12,
+                  "startLine": 14,
                   "startColumn": 1,
-                  "endLine": 14,
+                  "endLine": 16,
                   "endColumn": 68,
-                  "charOffset": 295,
+                  "charOffset": 443,
                   "charLength": 156,
                   "snippet": {
                     "text": "{\n    private readonly IHttpClientFactory _httpClientFactory = httpClientFactoryFactory;\n    private readonly IConfiguration _configuration = configuration;"
@@ -77184,6 +77177,110 @@
           ],
           "partialFingerprints": {
             "equalIndicator/v1": "17F716D14115D27FF6C3B762E4ED28CD56913D763F5675D91299B63A4EA9607E"
+          },
+          "baselineState": "unchanged",
+          "properties": {
+            "qodanaSeverity": "Moderate",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "ReplaceWithPrimaryConstructorParameter",
+          "ruleIndex": 2659,
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Replace with primary constructor parameter"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/ElectroluxClient.cs",
+                  "uriBaseId": "solutionDir"
+                },
+                "region": {
+                  "startLine": 16,
+                  "startColumn": 5,
+                  "endLine": 16,
+                  "endColumn": 68,
+                  "charOffset": 536,
+                  "charLength": 63,
+                  "snippet": {
+                    "text": "private readonly IConfiguration _configuration = configuration;"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 15,
+                  "startColumn": 1,
+                  "endLine": 17,
+                  "endColumn": 65,
+                  "charOffset": 445,
+                  "charLength": 219,
+                  "snippet": {
+                    "text": "    private readonly IHttpClientFactory _httpClientFactory = httpClientFactoryFactory;\n    private readonly IConfiguration _configuration = configuration;\n    private readonly ILogger<ElectroluxClient> _logger = logger;"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "04153A4B5924141DE9D1C23C31CD64341D80DC9A8A7D57F4C007704844C0BB84"
+          },
+          "baselineState": "unchanged",
+          "properties": {
+            "qodanaSeverity": "Moderate",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "ReplaceWithPrimaryConstructorParameter",
+          "ruleIndex": 2659,
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Replace with primary constructor parameter"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/ElectroluxClient.cs",
+                  "uriBaseId": "solutionDir"
+                },
+                "region": {
+                  "startLine": 17,
+                  "startColumn": 5,
+                  "endLine": 17,
+                  "endColumn": 65,
+                  "charOffset": 604,
+                  "charLength": 60,
+                  "snippet": {
+                    "text": "private readonly ILogger<ElectroluxClient> _logger = logger;"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 16,
+                  "startColumn": 1,
+                  "endLine": 18,
+                  "endColumn": 100,
+                  "charOffset": 532,
+                  "charLength": 232,
+                  "snippet": {
+                    "text": "    private readonly IConfiguration _configuration = configuration;\n    private readonly ILogger<ElectroluxClient> _logger = logger;\n    private HttpClient HttpClient => field ??= _httpClientFactory.CreateClient(\"ElectroluxClient\");"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "EFC07202D3B6521A2EF332F59B5C83B1464631C1F845D4805B158A11FE54DDFD"
           },
           "baselineState": "new",
           "properties": {
@@ -77210,32 +77307,32 @@
                   "uriBaseId": "solutionDir"
                 },
                 "region": {
-                  "startLine": 14,
+                  "startLine": 427,
                   "startColumn": 5,
-                  "endLine": 14,
-                  "endColumn": 68,
-                  "charOffset": 388,
-                  "charLength": 63,
+                  "endLine": 427,
+                  "endColumn": 85,
+                  "charOffset": 19086,
+                  "charLength": 80,
                   "snippet": {
-                    "text": "private readonly IConfiguration _configuration = configuration;"
+                    "text": "private readonly HttpResponseMessage _httpResponseMessage = httpResponseMessage;"
                   }
                 },
                 "contextRegion": {
-                  "startLine": 13,
+                  "startLine": 426,
                   "startColumn": 1,
-                  "endLine": 15,
-                  "endColumn": 82,
-                  "charOffset": 297,
-                  "charLength": 236,
+                  "endLine": 428,
+                  "endColumn": 1,
+                  "charOffset": 19080,
+                  "charLength": 87,
                   "snippet": {
-                    "text": "    private readonly IHttpClientFactory _httpClientFactory = httpClientFactoryFactory;\n    private readonly IConfiguration _configuration = configuration;\n    private HttpClient HttpClient => field ??= _httpClientFactory.CreateClient();"
+                    "text": "{\n    private readonly HttpResponseMessage _httpResponseMessage = httpResponseMessage;\n"
                   }
                 }
               }
             }
           ],
           "partialFingerprints": {
-            "equalIndicator/v1": "AE5C6684FB99CC7018FB39DD924A2633A7B56EFE340186F8A900C6C8A9CCC294"
+            "equalIndicator/v1": "A005D866F1319C0001B2748D77C066BC8CAC7DBCC3317EBBD925530BF65A3B8C"
           },
           "baselineState": "new",
           "properties": {
@@ -77263,34 +77360,34 @@
                   "index": 1
                 },
                 "region": {
-                  "startLine": 27,
+                  "startLine": 29,
                   "startColumn": 5,
-                  "endLine": 27,
+                  "endLine": 29,
                   "endColumn": 76,
-                  "charOffset": 1017,
+                  "charOffset": 1103,
                   "charLength": 71,
                   "snippet": {
                     "text": "private readonly ElectroluxClient _electroluxClient = electroluxClient;"
                   }
                 },
                 "contextRegion": {
-                  "startLine": 26,
+                  "startLine": 28,
                   "startColumn": 1,
-                  "endLine": 28,
-                  "endColumn": 135,
-                  "charOffset": 1011,
-                  "charLength": 212,
+                  "endLine": 30,
+                  "endColumn": 113,
+                  "charOffset": 1097,
+                  "charLength": 190,
                   "snippet": {
-                    "text": "{\n    private readonly ElectroluxClient _electroluxClient = electroluxClient;\n    private static readonly ConcurrentDictionary<string, ClimateState> ReportedEntityIdStates = new(StringComparer.OrdinalIgnoreCase);"
+                    "text": "{\n    private readonly ElectroluxClient _electroluxClient = electroluxClient;\n    private static readonly ClimateOptions ClimateOptions = new() { TemperatureUnit = TemperatureUnit.Celsius };"
                   }
                 }
               }
             }
           ],
           "partialFingerprints": {
-            "equalIndicator/v1": "0B534E493E831B9F4A1087CA87BCCE9F59515DA235ABFFB10BAE6E43C8177217"
+            "equalIndicator/v1": "DD4B6A9B855C71DD3DC1DBEF3269818E7B8C4F09D5E11262939836EDB2C09674"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "Moderate",
             "tags": [
@@ -77301,10 +77398,10 @@
         }
       ],
       "automationDetails": {
-        "id": "QDNETC/qodana/2026-02-27",
-        "guid": "f721b7dd-0d91-4cb7-9323-331f02172588",
+        "id": "QDNETC/qodana/2026-03-13",
+        "guid": "f514206e-9087-4a9b-bfd2-fc41280dacc7",
         "properties": {
-          "jobUrl": "https://github.com/henrikwidlund/unfoldedcircle-electrolux/actions/runs/22489868789"
+          "jobUrl": "https://github.com/henrikwidlund/unfoldedcircle-electrolux/actions/runs/23059530747"
         }
       },
       "newlineSequences": [
