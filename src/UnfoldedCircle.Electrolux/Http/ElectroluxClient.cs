@@ -345,8 +345,8 @@ internal sealed class EmptyStreamEventJsonConverter : JsonConverter<EmptyStreamE
             throw new JsonException("Expected start of JSON object.");
 
         string? userId = null;
-        string ? applianceId = null;
-        string ? property = null;
+        string? applianceId = null;
+        string? property = null;
         int? intValue = null;
         string? stringValue = null;
         bool? boolValue = null;

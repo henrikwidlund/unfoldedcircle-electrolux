@@ -174,7 +174,7 @@ internal sealed class ElectroluxWebSocketHandler(
                         await HandleElectroluxEvent(socket, wsId, subscribedEntities, liveStreamEvent, cancellationToken);
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 // Normal shutdown: cancellation requested, exit without logging an error or delaying.
                 return;
