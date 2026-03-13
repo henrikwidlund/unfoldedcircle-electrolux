@@ -163,7 +163,7 @@ internal sealed class ElectroluxWebSocketHandler(
                 {
                     _logger.FailedToGetLiveStream(wsId);
                     // treat null livestream as transient: wait a bit before trying again
-                    await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+                    await SafeDelayAsync(TimeSpan.FromSeconds(10), cancellationToken);
                     continue;
                 }
 
@@ -171,12 +171,10 @@ internal sealed class ElectroluxWebSocketHandler(
                 await foreach (var liveStreamEvent in ElectroluxClient.GetLiveStreamEventsAsync(stream, cancellationToken))
                 {
                     if (subscribedEntitiesHolder.SubscribedEntities.TryGetValue(liveStreamEvent.ApplianceId, out var subscribedEntities))
-                    {
                         await HandleElectroluxEvent(socket, wsId, subscribedEntities, liveStreamEvent, cancellationToken);
-                    }
                 }
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            catch (OperationCanceledException)
             {
                 // Normal shutdown: cancellation requested, exit without logging an error or delaying.
                 return;
@@ -184,9 +182,20 @@ internal sealed class ElectroluxWebSocketHandler(
             catch (Exception e)
             {
                 _logger.FailureDuringBroadcast(e, wsId);
-                // something went wrong during the live stream, wait a bit before trying again to avoid tight error loops
-                await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+                await SafeDelayAsync(TimeSpan.FromSeconds(10), cancellationToken);
             }
+        }
+    }
+
+    private static async Task SafeDelayAsync(TimeSpan delay, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(delay, cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // Cancellation requested during delay: treat as normal shutdown.
         }
     }
 
