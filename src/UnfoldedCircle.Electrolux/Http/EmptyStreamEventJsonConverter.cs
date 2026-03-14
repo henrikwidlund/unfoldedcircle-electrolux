@@ -36,7 +36,7 @@ internal sealed class EmptyStreamEventJsonConverter : JsonConverter<EmptyStreamE
                     reader.Read();
                     property = GetPropertyValueType(reader);
                 }
-                else if (reader.ValueTextEquals("value"))
+                else if (reader.ValueTextEquals("value"u8))
                 {
                     reader.Read();
                     valueSpan = GetValueSpan(reader, out rentedBytes);
