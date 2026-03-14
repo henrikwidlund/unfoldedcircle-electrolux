@@ -1,19 +1,16 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Net.ServerSentEvents;
 using System.Runtime.CompilerServices;
 using System.Text;
-
-using Theodicean.SourceGenerators;
 
 using UnfoldedCircle.Electrolux.Json;
 using UnfoldedCircle.Electrolux.Logging;
 
 namespace UnfoldedCircle.Electrolux.Http;
 
-public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConfiguration configuration, ILogger<ElectroluxClient> logger)
+public sealed class ElectroluxClient(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<ElectroluxClient> logger)
 {
-    private readonly IHttpClientFactory _httpClientFactory = httpClientFactoryFactory;
+    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
     private readonly IConfiguration _configuration = configuration;
     private readonly ILogger<ElectroluxClient> _logger = logger;
     private HttpClient HttpClient => field ??= _httpClientFactory.CreateClient("ElectroluxClient");
@@ -256,187 +253,4 @@ public class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConf
             yield return data;
         }
     }
-}
-
-public sealed record TokenResult(string? AccessToken, string RefreshToken, DateTimeOffset ExpiresAt, string ApiKey);
-
-public sealed record RefreshTokenRequest(
-    [property: JsonPropertyName("refreshToken")] string RefreshToken);
-
-public sealed record RefreshTokenResponse(
-    [property: JsonPropertyName("accessToken")] string AccessToken,
-    [property: JsonPropertyName("expiresIn")] uint ExpiresIn,
-    [property: JsonPropertyName("refreshToken")] string RefreshToken);
-
-public sealed record Appliance(
-    [property: JsonPropertyName("applianceId")] string ApplianceId);
-
-public sealed record ApplianceInfo(
-    [property: JsonPropertyName("deviceType")] string DeviceType,
-    [property: JsonPropertyName("model")] string Model,
-    [property: JsonPropertyName("brand")] string Brand);
-
-public sealed record ApplianceInfoResponse(
-    [property: JsonPropertyName("applianceInfo")] ApplianceInfo ApplianceInfo);
-
-public sealed record ApplianceResult(string ApplianceId, string Model, string Brand);
-
-[EnumJsonConverter<WorkMode>(CaseSensitive = false, PropertyName = "features")]
-[JsonConverter(typeof(WorkModeJsonConverter))]
-public enum WorkMode
-{
-    PowerOff = 1,
-    Auto = 2,
-    Manual = 3
-}
-
-// ReSharper disable once RedundantExtendsListEntry For some reason code won't compile without adding this explicit inheritance on this specific converter - all other work
-public partial class WorkModeJsonConverter : JsonConverter<WorkMode>;
-
-public sealed record PurifierCommand(
-    [property: JsonPropertyName("Workmode"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] WorkMode? WorkMode,
-    [property: JsonPropertyName("Fanspeed"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] sbyte? FanSpeed);
-
-public sealed record ApplianceState([property: JsonPropertyName("properties")] ApplianceProperties Properties);
-
-public sealed record ApplianceProperties([property: JsonPropertyName("reported")] ApplianceReportedProperty Reported);
-
-public sealed record ApplianceReportedProperty(
-    [property: JsonPropertyName("Workmode")] WorkMode WorkMode,
-    [property: JsonPropertyName("Fanspeed")] sbyte FanSpeed,
-    [property: JsonPropertyName("TVOC")] ushort Tvoc,
-    [property: JsonPropertyName("CO2")] ushort Co2,
-    [property: JsonPropertyName("Temp")] short Temperature,
-    [property: JsonPropertyName("Humidity")] sbyte Humidity,
-    [property: JsonPropertyName("PM1")] ushort Pm1,
-    [property: JsonPropertyName("PM2_5")] ushort Pm25,
-    [property: JsonPropertyName("PM10")] ushort Pm10,
-    [property: JsonPropertyName("ECO2")] ushort Eco2
-);
-
-public sealed record LiveStreamResponse(
-    [property: JsonPropertyName("url")] Uri Url,
-    [property: JsonPropertyName("appliances")] LiveStreamAppliance[] Appliances);
-
-public sealed record LiveStreamAppliance(
-    [property: JsonPropertyName("applianceId")] string ApplianceId,
-    [property: JsonPropertyName("properties")] string[] Properties);
-
-[JsonDerivedType(typeof(LiveStreamEvent))]
-[JsonDerivedType(typeof(LiveStreamEvent<string>))]
-[JsonDerivedType(typeof(LiveStreamEvent<int>))]
-[JsonDerivedType(typeof(LiveStreamEvent<bool>))]
-[JsonConverter(typeof(EmptyStreamEventJsonConverter))]
-public record EmptyStreamEvent;
-
-public record LiveStreamEvent(
-    [property: JsonPropertyName("userId")] string UserId,
-    [property: JsonPropertyName("applianceId")] string ApplianceId,
-    [property: JsonPropertyName("property")] string Property
-): EmptyStreamEvent;
-
-public sealed record LiveStreamEvent<TValue>(
-    string UserId,
-    string ApplianceId,
-    string Property,
-    [property: JsonPropertyName("value")] TValue Value
-): LiveStreamEvent(UserId, ApplianceId, Property);
-
-internal sealed class EmptyStreamEventJsonConverter : JsonConverter<EmptyStreamEvent>
-{
-    private static readonly EmptyStreamEvent EmptyStreamEvent = new();
-
-    public override EmptyStreamEvent Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        if (reader.TokenType != JsonTokenType.StartObject)
-            throw new JsonException("Expected start of JSON object.");
-
-        string? userId = null;
-        string? applianceId = null;
-        string? property = null;
-        int? intValue = null;
-        string? stringValue = null;
-        bool? boolValue = null;
-
-        while (reader.TokenType != JsonTokenType.EndObject && reader.Read())
-        {
-            if (reader.TokenType != JsonTokenType.PropertyName)
-                continue;
-
-            if (reader.ValueTextEquals("userId"u8))
-            {
-                reader.Read();
-                userId = reader.GetString();
-            }
-            else if (reader.ValueTextEquals("applianceId"u8))
-            {
-                reader.Read();
-                applianceId = reader.GetString();
-            }
-            else if (reader.ValueTextEquals("property"u8))
-            {
-                reader.Read();
-                property = reader.GetString();
-            }
-            else if (reader.ValueTextEquals("value"))
-            {
-                reader.Read();
-                switch (reader.TokenType)
-                {
-                    case JsonTokenType.String:
-                        stringValue = reader.GetString();
-                        break;
-                    case JsonTokenType.Number:
-                        if (reader.TryGetInt32(out var intResult))
-                            intValue = intResult;
-                        break;
-                    case JsonTokenType.True:
-                    case JsonTokenType.False:
-                        boolValue = reader.GetBoolean();
-                        break;
-                }
-            }
-        }
-
-        if (string.IsNullOrEmpty(userId))
-        {
-            // this never happens unless we get a ping event, in which case we will return an empty event so it can be ignored
-            return EmptyStreamEvent;
-        }
-        applianceId.ValidateHasValue();
-        property.ValidateHasValue();
-
-        if (intValue.HasValue)
-            return new LiveStreamEvent<int>(userId, applianceId, property, intValue.Value);
-        if (boolValue.HasValue)
-            return new LiveStreamEvent<bool>(userId, applianceId, property, boolValue.Value);
-        if (stringValue is not null)
-            return new LiveStreamEvent<string>(userId, applianceId, property, stringValue);
-
-        throw new JsonException("value property is missing.");
-    }
-
-    public override void Write(Utf8JsonWriter writer, EmptyStreamEvent value, JsonSerializerOptions options) => throw new NotSupportedException();
-}
-
-file static class JsonValidationExtensions
-{
-    // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-    extension([NotNull] string? val)
-    {
-        public void ValidateHasValue([CallerMemberName]string? memberName = null)
-        {
-            if (val is null)
-                throw new JsonException($"{memberName} should not be null.");
-        }
-    }
-}
-
-public sealed class ElectroluxLiveStream(HttpResponseMessage httpResponseMessage) : IDisposable
-{
-    private readonly HttpResponseMessage _httpResponseMessage = httpResponseMessage;
-
-    public Task<Stream> GetStreamAsync(CancellationToken cancellationToken) => _httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken);
-
-    public void Dispose() => _httpResponseMessage.Dispose();
 }

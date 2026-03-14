@@ -218,39 +218,39 @@ internal sealed class ElectroluxWebSocketHandler(
     {
         return liveStreamEvent.Property switch
         {
-            "Workmode" => SendClimateAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x => x.EntityType == EntityType.Climate)?.EntityId,
-                ((LiveStreamEvent<string>)liveStreamEvent).Value, null, cancellationToken),
-            "Fanspeed" => SendSelectAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x => x.EntityType == EntityType.Select)?.EntityId,
-                (sbyte?)((LiveStreamEvent<int>)liveStreamEvent).Value, cancellationToken),
-            "TVOC" => SendTvocSensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
+            PropertyValueType.WorkMode => SendClimateAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x => x.EntityType == EntityType.Climate)?.EntityId,
+                ((LiveStreamEvent<WorkMode>)liveStreamEvent).Value, null, cancellationToken),
+            PropertyValueType.FanSpeed => SendSelectAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x => x.EntityType == EntityType.Select)?.EntityId,
+                ((LiveStreamEvent<sbyte>)liveStreamEvent).Value, cancellationToken),
+            PropertyValueType.Tvoc => SendTvocSensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
                     x.EntityType == EntityType.Sensor && x.EntityId.EndsWith(ElectroluxServerConstants.TvocSuffix, StringComparison.OrdinalIgnoreCase))
-                ?.EntityId, (ushort)((LiveStreamEvent<int>)liveStreamEvent).Value, cancellationToken),
-            "CO2" => SendCo2SensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
+                ?.EntityId, ((LiveStreamEvent<ushort>)liveStreamEvent).Value, cancellationToken),
+            PropertyValueType.Co2 => SendCo2SensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
                     x.EntityType == EntityType.Sensor && x.EntityId.EndsWith(ElectroluxServerConstants.Co2Suffix, StringComparison.OrdinalIgnoreCase))
-                ?.EntityId, (ushort)((LiveStreamEvent<int>)liveStreamEvent).Value, cancellationToken),
-            "Temp" => HandleTemperatureEvent(socket, wsId, subscribedEntities, liveStreamEvent, cancellationToken),
-            "Humidity" => SendHumiditySensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
+                ?.EntityId, ((LiveStreamEvent<ushort>)liveStreamEvent).Value, cancellationToken),
+            PropertyValueType.Temperature => HandleTemperatureEvent(socket, wsId, subscribedEntities, liveStreamEvent, cancellationToken),
+            PropertyValueType.Humidity => SendHumiditySensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
                     x.EntityType == EntityType.Sensor && x.EntityId.EndsWith(ElectroluxServerConstants.HumiditySuffix, StringComparison.OrdinalIgnoreCase))
-                ?.EntityId, (sbyte)((LiveStreamEvent<int>)liveStreamEvent).Value, cancellationToken),
-            "PM1" => SendPm1SensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
+                ?.EntityId, ((LiveStreamEvent<sbyte>)liveStreamEvent).Value, cancellationToken),
+            PropertyValueType.Pm1 => SendPm1SensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
                     x.EntityType == EntityType.Sensor && x.EntityId.EndsWith(ElectroluxServerConstants.Pm1Suffix, StringComparison.OrdinalIgnoreCase))
-                ?.EntityId, (ushort)((LiveStreamEvent<int>)liveStreamEvent).Value, cancellationToken),
-            "PM2_5" => SendPm25SensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
+                ?.EntityId, ((LiveStreamEvent<ushort>)liveStreamEvent).Value, cancellationToken),
+            PropertyValueType.Pm25 => SendPm25SensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
                     x.EntityType == EntityType.Sensor && x.EntityId.EndsWith(ElectroluxServerConstants.Pm25Suffix, StringComparison.OrdinalIgnoreCase))
-                ?.EntityId, (ushort)((LiveStreamEvent<int>)liveStreamEvent).Value, cancellationToken),
-            "PM10" => SendPm10SensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
+                ?.EntityId, ((LiveStreamEvent<ushort>)liveStreamEvent).Value, cancellationToken),
+            PropertyValueType.Pm10 => SendPm10SensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
                     x.EntityType == EntityType.Sensor && x.EntityId.EndsWith(ElectroluxServerConstants.Pm10Suffix, StringComparison.OrdinalIgnoreCase))
-                ?.EntityId, (ushort)((LiveStreamEvent<int>)liveStreamEvent).Value, cancellationToken),
-            "ECO2" => SendEco2SensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
+                ?.EntityId, ((LiveStreamEvent<ushort>)liveStreamEvent).Value, cancellationToken),
+            PropertyValueType.Eco2 => SendEco2SensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
                     x.EntityType == EntityType.Sensor && x.EntityId.EndsWith(ElectroluxServerConstants.Eco2Suffix, StringComparison.OrdinalIgnoreCase))
-                ?.EntityId, (ushort)((LiveStreamEvent<int>)liveStreamEvent).Value, cancellationToken),
+                ?.EntityId, ((LiveStreamEvent<ushort>)liveStreamEvent).Value, cancellationToken),
             _ => Task.CompletedTask
         };
     }
 
     private Task HandleTemperatureEvent(System.Net.WebSockets.WebSocket socket, string wsId, HashSet<SubscribedEntity> subscribedEntities, LiveStreamEvent liveStreamEvent, CancellationToken cancellationToken)
     {
-        var tempValue = (short)((LiveStreamEvent<int>)liveStreamEvent).Value;
+        var tempValue = ((LiveStreamEvent<sbyte>)liveStreamEvent).Value;
         return Task.WhenAll(
             SendTemperatureSensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
                     x.EntityType == EntityType.Sensor && x.EntityId.EndsWith(ElectroluxServerConstants.TemperatureSuffix, StringComparison.OrdinalIgnoreCase))
@@ -342,7 +342,7 @@ internal sealed class ElectroluxWebSocketHandler(
         return Task.WhenAll(tasks);
     }
 
-    private Task SendTemperatureSensorAsync(System.Net.WebSockets.WebSocket socket, string wsId, string? entityId, short? temperature, CancellationToken cancellationToken)
+    private Task SendTemperatureSensorAsync(System.Net.WebSockets.WebSocket socket, string wsId, string? entityId, sbyte? temperature, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(entityId))
             return Task.CompletedTask;
