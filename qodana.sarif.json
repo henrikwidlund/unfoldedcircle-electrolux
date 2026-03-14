@@ -77100,7 +77100,7 @@
       "versionControlProvenance": [
         {
           "repositoryUri": "https://github.com/henrikwidlund/unfoldedcircle-electrolux.git",
-          "revisionId": "bfda904760a99cb4a74e28155d971e3f83549c49",
+          "revisionId": "5e3285eacf0898a2d1e8397da6a8b2d20ee17bff",
           "branch": "feature/optmize",
           "properties": {
             "repoUrl": "https://github.com/henrikwidlund/unfoldedcircle-electrolux.git",
@@ -77257,117 +77257,11 @@
                   "index": 14
                 },
                 "region": {
-                  "startLine": 13,
-                  "startColumn": 5,
-                  "endLine": 13,
-                  "endColumn": 87,
-                  "charOffset": 400,
-                  "charLength": 82,
-                  "snippet": {
-                    "text": "private readonly IHttpClientFactory _httpClientFactory = httpClientFactoryFactory;"
-                  }
-                },
-                "contextRegion": {
-                  "startLine": 12,
-                  "startColumn": 1,
-                  "endLine": 14,
-                  "endColumn": 68,
-                  "charOffset": 394,
-                  "charLength": 156,
-                  "snippet": {
-                    "text": "{\n    private readonly IHttpClientFactory _httpClientFactory = httpClientFactoryFactory;\n    private readonly IConfiguration _configuration = configuration;"
-                  }
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "equalIndicator/v1": "17F716D14115D27FF6C3B762E4ED28CD56913D763F5675D91299B63A4EA9607E"
-          },
-          "baselineState": "unchanged",
-          "properties": {
-            "qodanaSeverity": "Moderate",
-            "tags": [
-              "C#",
-              ".NET 10.0"
-            ]
-          }
-        },
-        {
-          "ruleId": "ReplaceWithPrimaryConstructorParameter",
-          "ruleIndex": 2659,
-          "kind": "fail",
-          "level": "note",
-          "message": {
-            "text": "Replace with primary constructor parameter"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/ElectroluxClient.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 14
-                },
-                "region": {
-                  "startLine": 14,
-                  "startColumn": 5,
-                  "endLine": 14,
-                  "endColumn": 68,
-                  "charOffset": 487,
-                  "charLength": 63,
-                  "snippet": {
-                    "text": "private readonly IConfiguration _configuration = configuration;"
-                  }
-                },
-                "contextRegion": {
-                  "startLine": 13,
-                  "startColumn": 1,
-                  "endLine": 15,
-                  "endColumn": 65,
-                  "charOffset": 396,
-                  "charLength": 219,
-                  "snippet": {
-                    "text": "    private readonly IHttpClientFactory _httpClientFactory = httpClientFactoryFactory;\n    private readonly IConfiguration _configuration = configuration;\n    private readonly ILogger<ElectroluxClient> _logger = logger;"
-                  }
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "equalIndicator/v1": "04153A4B5924141DE9D1C23C31CD64341D80DC9A8A7D57F4C007704844C0BB84"
-          },
-          "baselineState": "unchanged",
-          "properties": {
-            "qodanaSeverity": "Moderate",
-            "tags": [
-              "C#",
-              ".NET 10.0"
-            ]
-          }
-        },
-        {
-          "ruleId": "ReplaceWithPrimaryConstructorParameter",
-          "ruleIndex": 2659,
-          "kind": "fail",
-          "level": "note",
-          "message": {
-            "text": "Replace with primary constructor parameter"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/ElectroluxClient.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 14
-                },
-                "region": {
                   "startLine": 15,
                   "startColumn": 5,
                   "endLine": 15,
                   "endColumn": 65,
-                  "charOffset": 555,
+                  "charOffset": 541,
                   "charLength": 60,
                   "snippet": {
                     "text": "private readonly ILogger<ElectroluxClient> _logger = logger;"
@@ -77378,7 +77272,7 @@
                   "startColumn": 1,
                   "endLine": 16,
                   "endColumn": 100,
-                  "charOffset": 483,
+                  "charOffset": 469,
                   "charLength": 232,
                   "snippet": {
                     "text": "    private readonly IConfiguration _configuration = configuration;\n    private readonly ILogger<ElectroluxClient> _logger = logger;\n    private HttpClient HttpClient => field ??= _httpClientFactory.CreateClient(\"ElectroluxClient\");"
@@ -77547,7 +77441,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
             "tags": [
@@ -77568,9 +77462,8 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceInfo.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 1
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+                  "uriBaseId": "solutionDir"
                 },
                 "region": {
                   "startLine": 1,
@@ -77599,7 +77492,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
             "tags": [
@@ -77620,9 +77513,8 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceInfoResponse.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 2
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+                  "uriBaseId": "solutionDir"
                 },
                 "region": {
                   "startLine": 1,
@@ -77651,7 +77543,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
             "tags": [
@@ -77672,9 +77564,8 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceProperties.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 3
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+                  "uriBaseId": "solutionDir"
                 },
                 "region": {
                   "startLine": 1,
@@ -77703,7 +77594,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
             "tags": [
@@ -77724,9 +77615,8 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceReportedProperty.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 4
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+                  "uriBaseId": "solutionDir"
                 },
                 "region": {
                   "startLine": 1,
@@ -77755,7 +77645,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
             "tags": [
@@ -77776,9 +77666,8 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceState.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 5
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+                  "uriBaseId": "solutionDir"
                 },
                 "region": {
                   "startLine": 1,
@@ -77807,7 +77696,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
             "tags": [
@@ -77828,9 +77717,8 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/EmptyStreamEvent.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 6
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+                  "uriBaseId": "solutionDir"
                 },
                 "region": {
                   "startLine": 1,
@@ -77859,7 +77747,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
             "tags": [
@@ -77880,9 +77768,8 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/LiveStreamAppliance.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 7
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+                  "uriBaseId": "solutionDir"
                 },
                 "region": {
                   "startLine": 1,
@@ -77911,7 +77798,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
             "tags": [
@@ -77932,9 +77819,8 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/LiveStreamEvent.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 8
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+                  "uriBaseId": "solutionDir"
                 },
                 "region": {
                   "startLine": 1,
@@ -77963,7 +77849,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
             "tags": [
@@ -77984,9 +77870,8 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/LiveStreamResponse.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 9
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+                  "uriBaseId": "solutionDir"
                 },
                 "region": {
                   "startLine": 1,
@@ -78015,7 +77900,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
             "tags": [
@@ -78036,9 +77921,8 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/PurifierCommand.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 10
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+                  "uriBaseId": "solutionDir"
                 },
                 "region": {
                   "startLine": 1,
@@ -78067,7 +77951,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
             "tags": [
@@ -78088,9 +77972,8 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/RefreshTokenRequest.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 11
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+                  "uriBaseId": "solutionDir"
                 },
                 "region": {
                   "startLine": 1,
@@ -78119,7 +78002,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
             "tags": [
@@ -78140,9 +78023,8 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/RefreshTokenResponse.cs",
-                  "uriBaseId": "solutionDir",
-                  "index": 12
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+                  "uriBaseId": "solutionDir"
                 },
                 "region": {
                   "startLine": 1,
@@ -78171,7 +78053,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
             "tags": [
@@ -78224,9 +78106,115 @@
           "partialFingerprints": {
             "equalIndicator/v1": "5F2DA96B4B6AA59484798BDBAF18B3461E3AC573504A4736DC1DBD5A0732EAC2"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "ReplaceWithPrimaryConstructorParameter",
+          "ruleIndex": 2659,
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Replace with primary constructor parameter"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/ElectroluxClient.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 14
+                },
+                "region": {
+                  "startLine": 13,
+                  "startColumn": 5,
+                  "endLine": 13,
+                  "endColumn": 80,
+                  "charOffset": 393,
+                  "charLength": 75,
+                  "snippet": {
+                    "text": "private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 12,
+                  "startColumn": 1,
+                  "endLine": 14,
+                  "endColumn": 68,
+                  "charOffset": 387,
+                  "charLength": 149,
+                  "snippet": {
+                    "text": "{\n    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;\n    private readonly IConfiguration _configuration = configuration;"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "D6F0FC24BF1F97DBF343BA461E55C6A7DF3F6E5461CC42A197A53EF1F5B339CA"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "Moderate",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "ReplaceWithPrimaryConstructorParameter",
+          "ruleIndex": 2659,
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Replace with primary constructor parameter"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/ElectroluxClient.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 14
+                },
+                "region": {
+                  "startLine": 14,
+                  "startColumn": 5,
+                  "endLine": 14,
+                  "endColumn": 68,
+                  "charOffset": 473,
+                  "charLength": 63,
+                  "snippet": {
+                    "text": "private readonly IConfiguration _configuration = configuration;"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 13,
+                  "startColumn": 1,
+                  "endLine": 15,
+                  "endColumn": 65,
+                  "charOffset": 389,
+                  "charLength": 212,
+                  "snippet": {
+                    "text": "    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;\n    private readonly IConfiguration _configuration = configuration;\n    private readonly ILogger<ElectroluxClient> _logger = logger;"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "F92CEE6605FFE344D559F682F19993A017FA5EB11B532CBF52C0AA92AC2DC15C"
+          },
+          "baselineState": "unchanged",
+          "properties": {
+            "qodanaSeverity": "Moderate",
             "tags": [
               "C#",
               ".NET 10.0"
@@ -78236,9 +78224,9 @@
       ],
       "automationDetails": {
         "id": "QDNETC/qodana/2026-03-14",
-        "guid": "88997975-3cb4-4639-872f-05ef6d18e71e",
+        "guid": "f77d33b8-ad5a-4caa-a32f-6a6475f2117f",
         "properties": {
-          "jobUrl": "https://github.com/henrikwidlund/unfoldedcircle-electrolux/actions/runs/23095964116"
+          "jobUrl": "https://github.com/henrikwidlund/unfoldedcircle-electrolux/actions/runs/23096686137"
         }
       },
       "newlineSequences": [
