@@ -342,7 +342,7 @@ internal sealed class ElectroluxWebSocketHandler(
         return Task.WhenAll(tasks);
     }
 
-    private Task SendTemperatureSensorAsync(System.Net.WebSockets.WebSocket socket, string wsId, string? entityId, short? temperature, CancellationToken cancellationToken)
+    private Task SendTemperatureSensorAsync(System.Net.WebSockets.WebSocket socket, string wsId, string? entityId, sbyte? temperature, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(entityId))
             return Task.CompletedTask;
