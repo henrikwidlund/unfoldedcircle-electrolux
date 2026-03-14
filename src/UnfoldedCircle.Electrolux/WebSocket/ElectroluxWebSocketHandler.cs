@@ -250,7 +250,7 @@ internal sealed class ElectroluxWebSocketHandler(
 
     private Task HandleTemperatureEvent(System.Net.WebSockets.WebSocket socket, string wsId, HashSet<SubscribedEntity> subscribedEntities, LiveStreamEvent liveStreamEvent, CancellationToken cancellationToken)
     {
-        var tempValue = (short)((LiveStreamEvent<int>)liveStreamEvent).Value;
+        var tempValue = ((LiveStreamEvent<sbyte>)liveStreamEvent).Value;
         return Task.WhenAll(
             SendTemperatureSensorAsync(socket, wsId, subscribedEntities.FirstOrDefault(static x =>
                     x.EntityType == EntityType.Sensor && x.EntityId.EndsWith(ElectroluxServerConstants.TemperatureSuffix, StringComparison.OrdinalIgnoreCase))
