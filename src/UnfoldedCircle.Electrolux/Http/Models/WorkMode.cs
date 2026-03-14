@@ -4,11 +4,11 @@ namespace UnfoldedCircle.Electrolux.Http;
 
 [EnumJsonConverter<WorkMode>(CaseSensitive = false, PropertyName = "Workmode")]
 [JsonConverter(typeof(WorkModeJsonConverter))]
-public enum WorkMode
+public enum WorkMode : sbyte
 {
     PowerOff = 1,
-    Auto = 2,
-    Manual = 3
+    Auto,
+    Manual
 }
 
 // ReSharper disable once RedundantExtendsListEntry For some reason code won't compile without adding this explicit inheritance on this specific converter - all other work
