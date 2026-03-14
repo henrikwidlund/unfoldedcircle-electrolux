@@ -77100,8 +77100,8 @@
       "versionControlProvenance": [
         {
           "repositoryUri": "https://github.com/henrikwidlund/unfoldedcircle-electrolux.git",
-          "revisionId": "a4dfeba88b9c8dcbff70496b470025fac83e9752",
-          "branch": "feature/live_stream_support",
+          "revisionId": "bfda904760a99cb4a74e28155d971e3f83549c49",
+          "branch": "feature/optmize",
           "properties": {
             "repoUrl": "https://github.com/henrikwidlund/unfoldedcircle-electrolux.git",
             "lastAuthorName": "Henrik Widlund",
@@ -77121,7 +77121,112 @@
       "artifacts": [
         {
           "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceInfo.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceInfoResponse.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceProperties.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceReportedProperty.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceState.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/EmptyStreamEvent.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/LiveStreamAppliance.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/LiveStreamEvent.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/LiveStreamResponse.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/PurifierCommand.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/RefreshTokenRequest.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/RefreshTokenResponse.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/Models/WorkMode.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
             "uri": "src/UnfoldedCircle.Electrolux/Http/ElectroluxClient.cs",
+            "uriBaseId": "solutionDir"
+          },
+          "hashes": {}
+        },
+        {
+          "location": {
+            "uri": "src/UnfoldedCircle.Electrolux/Http/ElectroluxLiveStream.cs",
             "uriBaseId": "solutionDir"
           },
           "hashes": {}
@@ -77148,25 +77253,26 @@
               "physicalLocation": {
                 "artifactLocation": {
                   "uri": "src/UnfoldedCircle.Electrolux/Http/ElectroluxClient.cs",
-                  "uriBaseId": "solutionDir"
+                  "uriBaseId": "solutionDir",
+                  "index": 14
                 },
                 "region": {
-                  "startLine": 15,
+                  "startLine": 13,
                   "startColumn": 5,
-                  "endLine": 15,
+                  "endLine": 13,
                   "endColumn": 87,
-                  "charOffset": 449,
+                  "charOffset": 400,
                   "charLength": 82,
                   "snippet": {
                     "text": "private readonly IHttpClientFactory _httpClientFactory = httpClientFactoryFactory;"
                   }
                 },
                 "contextRegion": {
-                  "startLine": 14,
+                  "startLine": 12,
                   "startColumn": 1,
-                  "endLine": 16,
+                  "endLine": 14,
                   "endColumn": 68,
-                  "charOffset": 443,
+                  "charOffset": 394,
                   "charLength": 156,
                   "snippet": {
                     "text": "{\n    private readonly IHttpClientFactory _httpClientFactory = httpClientFactoryFactory;\n    private readonly IConfiguration _configuration = configuration;"
@@ -77200,25 +77306,26 @@
               "physicalLocation": {
                 "artifactLocation": {
                   "uri": "src/UnfoldedCircle.Electrolux/Http/ElectroluxClient.cs",
-                  "uriBaseId": "solutionDir"
+                  "uriBaseId": "solutionDir",
+                  "index": 14
                 },
                 "region": {
-                  "startLine": 16,
+                  "startLine": 14,
                   "startColumn": 5,
-                  "endLine": 16,
+                  "endLine": 14,
                   "endColumn": 68,
-                  "charOffset": 536,
+                  "charOffset": 487,
                   "charLength": 63,
                   "snippet": {
                     "text": "private readonly IConfiguration _configuration = configuration;"
                   }
                 },
                 "contextRegion": {
-                  "startLine": 15,
+                  "startLine": 13,
                   "startColumn": 1,
-                  "endLine": 17,
+                  "endLine": 15,
                   "endColumn": 65,
-                  "charOffset": 445,
+                  "charOffset": 396,
                   "charLength": 219,
                   "snippet": {
                     "text": "    private readonly IHttpClientFactory _httpClientFactory = httpClientFactoryFactory;\n    private readonly IConfiguration _configuration = configuration;\n    private readonly ILogger<ElectroluxClient> _logger = logger;"
@@ -77252,25 +77359,26 @@
               "physicalLocation": {
                 "artifactLocation": {
                   "uri": "src/UnfoldedCircle.Electrolux/Http/ElectroluxClient.cs",
-                  "uriBaseId": "solutionDir"
+                  "uriBaseId": "solutionDir",
+                  "index": 14
                 },
                 "region": {
-                  "startLine": 17,
+                  "startLine": 15,
                   "startColumn": 5,
-                  "endLine": 17,
+                  "endLine": 15,
                   "endColumn": 65,
-                  "charOffset": 604,
+                  "charOffset": 555,
                   "charLength": 60,
                   "snippet": {
                     "text": "private readonly ILogger<ElectroluxClient> _logger = logger;"
                   }
                 },
                 "contextRegion": {
-                  "startLine": 16,
+                  "startLine": 14,
                   "startColumn": 1,
-                  "endLine": 18,
+                  "endLine": 16,
                   "endColumn": 100,
-                  "charOffset": 532,
+                  "charOffset": 483,
                   "charLength": 232,
                   "snippet": {
                     "text": "    private readonly IConfiguration _configuration = configuration;\n    private readonly ILogger<ElectroluxClient> _logger = logger;\n    private HttpClient HttpClient => field ??= _httpClientFactory.CreateClient(\"ElectroluxClient\");"
@@ -77282,7 +77390,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "EFC07202D3B6521A2EF332F59B5C83B1464631C1F845D4805B158A11FE54DDFD"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "Moderate",
             "tags": [
@@ -77303,26 +77411,27 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "src/UnfoldedCircle.Electrolux/Http/ElectroluxClient.cs",
-                  "uriBaseId": "solutionDir"
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/ElectroluxLiveStream.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 15
                 },
                 "region": {
-                  "startLine": 427,
+                  "startLine": 5,
                   "startColumn": 5,
-                  "endLine": 427,
+                  "endLine": 5,
                   "endColumn": 85,
-                  "charOffset": 19086,
+                  "charOffset": 145,
                   "charLength": 80,
                   "snippet": {
                     "text": "private readonly HttpResponseMessage _httpResponseMessage = httpResponseMessage;"
                   }
                 },
                 "contextRegion": {
-                  "startLine": 426,
+                  "startLine": 4,
                   "startColumn": 1,
-                  "endLine": 428,
+                  "endLine": 6,
                   "endColumn": 1,
-                  "charOffset": 19080,
+                  "charOffset": 139,
                   "charLength": 87,
                   "snippet": {
                     "text": "{\n    private readonly HttpResponseMessage _httpResponseMessage = httpResponseMessage;\n"
@@ -77334,7 +77443,7 @@
           "partialFingerprints": {
             "equalIndicator/v1": "A005D866F1319C0001B2748D77C066BC8CAC7DBCC3317EBBD925530BF65A3B8C"
           },
-          "baselineState": "new",
+          "baselineState": "unchanged",
           "properties": {
             "qodanaSeverity": "Moderate",
             "tags": [
@@ -77357,7 +77466,7 @@
                 "artifactLocation": {
                   "uri": "src/UnfoldedCircle.Electrolux/WebSocket/ElectroluxWebSocketHandler.cs",
                   "uriBaseId": "solutionDir",
-                  "index": 1
+                  "index": 16
                 },
                 "region": {
                   "startLine": 29,
@@ -77395,13 +77504,741 @@
               ".NET 10.0"
             ]
           }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/Appliance.cs",
+                  "uriBaseId": "solutionDir"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 11,
+                  "endLine": 1,
+                  "endColumn": 41,
+                  "charOffset": 10,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 2,
+                  "endColumn": 1,
+                  "charLength": 42,
+                  "snippet": {
+                    "text": "namespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceInfo.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 1
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 11,
+                  "endLine": 1,
+                  "endColumn": 41,
+                  "charOffset": 10,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 2,
+                  "endColumn": 1,
+                  "charLength": 42,
+                  "snippet": {
+                    "text": "namespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceInfoResponse.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 2
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 11,
+                  "endLine": 1,
+                  "endColumn": 41,
+                  "charOffset": 10,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 2,
+                  "endColumn": 1,
+                  "charLength": 42,
+                  "snippet": {
+                    "text": "namespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceProperties.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 3
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 11,
+                  "endLine": 1,
+                  "endColumn": 41,
+                  "charOffset": 10,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 2,
+                  "endColumn": 1,
+                  "charLength": 42,
+                  "snippet": {
+                    "text": "namespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceReportedProperty.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 4
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 11,
+                  "endLine": 1,
+                  "endColumn": 41,
+                  "charOffset": 10,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 2,
+                  "endColumn": 1,
+                  "charLength": 42,
+                  "snippet": {
+                    "text": "namespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/ApplianceState.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 5
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 11,
+                  "endLine": 1,
+                  "endColumn": 41,
+                  "charOffset": 10,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 2,
+                  "endColumn": 1,
+                  "charLength": 42,
+                  "snippet": {
+                    "text": "namespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/EmptyStreamEvent.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 6
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 11,
+                  "endLine": 1,
+                  "endColumn": 41,
+                  "charOffset": 10,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 2,
+                  "endColumn": 1,
+                  "charLength": 42,
+                  "snippet": {
+                    "text": "namespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/LiveStreamAppliance.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 7
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 11,
+                  "endLine": 1,
+                  "endColumn": 41,
+                  "charOffset": 10,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 2,
+                  "endColumn": 1,
+                  "charLength": 42,
+                  "snippet": {
+                    "text": "namespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/LiveStreamEvent.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 8
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 11,
+                  "endLine": 1,
+                  "endColumn": 41,
+                  "charOffset": 10,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 2,
+                  "endColumn": 1,
+                  "charLength": 42,
+                  "snippet": {
+                    "text": "namespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/LiveStreamResponse.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 9
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 11,
+                  "endLine": 1,
+                  "endColumn": 41,
+                  "charOffset": 10,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 2,
+                  "endColumn": 1,
+                  "charLength": 42,
+                  "snippet": {
+                    "text": "namespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/PurifierCommand.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 10
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 11,
+                  "endLine": 1,
+                  "endColumn": 41,
+                  "charOffset": 10,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 2,
+                  "endColumn": 1,
+                  "charLength": 42,
+                  "snippet": {
+                    "text": "namespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/RefreshTokenRequest.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 11
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 11,
+                  "endLine": 1,
+                  "endColumn": 41,
+                  "charOffset": 10,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 2,
+                  "endColumn": 1,
+                  "charLength": 42,
+                  "snippet": {
+                    "text": "namespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/RefreshTokenResponse.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 12
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 11,
+                  "endLine": 1,
+                  "endColumn": 41,
+                  "charOffset": 10,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 2,
+                  "endColumn": 1,
+                  "charLength": 42,
+                  "snippet": {
+                    "text": "namespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "4B8EF04819BEDA079498820D64A6639EA831CF59085C2F9459A40613EE27195E"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
+        },
+        {
+          "ruleId": "CheckNamespace",
+          "ruleIndex": 336,
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Namespace does not correspond to file location, must be: 'UnfoldedCircle.Electrolux.Http.Models'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/UnfoldedCircle.Electrolux/Http/Models/WorkMode.cs",
+                  "uriBaseId": "solutionDir",
+                  "index": 13
+                },
+                "region": {
+                  "startLine": 3,
+                  "startColumn": 11,
+                  "endLine": 3,
+                  "endColumn": 41,
+                  "charOffset": 46,
+                  "charLength": 30,
+                  "snippet": {
+                    "text": "UnfoldedCircle.Electrolux.Http"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 2,
+                  "startColumn": 1,
+                  "endLine": 4,
+                  "endColumn": 1,
+                  "charOffset": 35,
+                  "charLength": 43,
+                  "snippet": {
+                    "text": "\nnamespace UnfoldedCircle.Electrolux.Http;\n"
+                  }
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "equalIndicator/v1": "5F2DA96B4B6AA59484798BDBAF18B3461E3AC573504A4736DC1DBD5A0732EAC2"
+          },
+          "baselineState": "new",
+          "properties": {
+            "qodanaSeverity": "High",
+            "tags": [
+              "C#",
+              ".NET 10.0"
+            ]
+          }
         }
       ],
       "automationDetails": {
-        "id": "QDNETC/qodana/2026-03-13",
-        "guid": "f514206e-9087-4a9b-bfd2-fc41280dacc7",
+        "id": "QDNETC/qodana/2026-03-14",
+        "guid": "88997975-3cb4-4639-872f-05ef6d18e71e",
         "properties": {
-          "jobUrl": "https://github.com/henrikwidlund/unfoldedcircle-electrolux/actions/runs/23059530747"
+          "jobUrl": "https://github.com/henrikwidlund/unfoldedcircle-electrolux/actions/runs/23095964116"
         }
       },
       "newlineSequences": [
