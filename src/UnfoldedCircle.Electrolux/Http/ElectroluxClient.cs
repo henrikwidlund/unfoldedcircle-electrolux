@@ -8,9 +8,9 @@ using UnfoldedCircle.Electrolux.Logging;
 
 namespace UnfoldedCircle.Electrolux.Http;
 
-public sealed class ElectroluxClient(IHttpClientFactory httpClientFactoryFactory, IConfiguration configuration, ILogger<ElectroluxClient> logger)
+public sealed class ElectroluxClient(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<ElectroluxClient> logger)
 {
-    private readonly IHttpClientFactory _httpClientFactory = httpClientFactoryFactory;
+    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
     private readonly IConfiguration _configuration = configuration;
     private readonly ILogger<ElectroluxClient> _logger = logger;
     private HttpClient HttpClient => field ??= _httpClientFactory.CreateClient("ElectroluxClient");
