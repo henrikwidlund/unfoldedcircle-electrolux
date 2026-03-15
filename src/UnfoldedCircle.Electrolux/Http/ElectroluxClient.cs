@@ -14,6 +14,7 @@ public sealed class ElectroluxClient(IHttpClientFactory httpClientFactory, IConf
     private readonly IConfiguration _configuration = configuration;
     private readonly ILogger<ElectroluxClient> _logger = logger;
     private HttpClient HttpClient => field ??= _httpClientFactory.CreateClient("ElectroluxClient");
+    private HttpClient LiveStreamClient => field ??= _httpClientFactory.CreateClient("ElectroluxLiveStreamClient");
     private TokenResult? _currentToken;
 
     private static readonly SemaphoreSlim TokenSemaphore = new(1, 1);
@@ -206,7 +207,7 @@ public sealed class ElectroluxClient(IHttpClientFactory httpClientFactory, IConf
         request.Headers.Authorization = authorizationHeader;
         request.Headers.Add(ApiKeyHeader, tokenResult.ApiKey);
 
-        using var response = await HttpClient.SendAsync(request, cancellationToken);
+        using var response = await LiveStreamClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
 
         var liveStreamResponse = await response.Content.ReadFromJsonAsync<LiveStreamResponse>(ElectroluxJsonSerializerContext.Default.LiveStreamResponse, cancellationToken);
@@ -220,7 +221,7 @@ public sealed class ElectroluxClient(IHttpClientFactory httpClientFactory, IConf
         HttpResponseMessage? httpResponse = null;
         try
         {
-            httpResponse = await HttpClient.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            httpResponse = await LiveStreamClient.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
             httpResponse.EnsureSuccessStatusCode();
             return new ElectroluxLiveStream(httpResponse);
         }

@@ -1,5 +1,7 @@
 using System.Net;
 
+using Microsoft.Extensions.Http.Resilience;
+
 using UnfoldedCircle.Electrolux.Configuration;
 using UnfoldedCircle.Electrolux.Http;
 using UnfoldedCircle.Electrolux.WebSocket;
@@ -11,15 +13,17 @@ builder.Services.AddHttpClient("ElectroluxClient", static client =>
 {
     client.DefaultRequestHeaders.UserAgent.Clear();
     client.DefaultRequestHeaders.UserAgent.ParseAdd("UnfoldedCircle/1.0");
-}).AddStandardResilienceHandler(static options => options.Retry.ShouldHandle = static outcome
-    => ValueTask.FromResult(outcome.Outcome.Result is
-    {
-        StatusCode:
-        HttpStatusCode.NotAcceptable or
-        HttpStatusCode.RequestTimeout or
-        HttpStatusCode.TooManyRequests or
-        >= HttpStatusCode.InternalServerError
-    }));
+}).AddStandardResilienceHandler(ConfigureShouldHandle);
+
+builder.Services.AddHttpClient("ElectroluxLiveStreamClient", static client =>
+{
+    client.DefaultRequestHeaders.UserAgent.Clear();
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("UnfoldedCircle/1.0");
+}).AddStandardResilienceHandler(static options =>
+{
+    options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(30);
+    ConfigureShouldHandle(options);
+});
 
 builder.AddUnfoldedCircleServer<ElectroluxWebSocketHandler, ElectroluxConfigurationService, UnfoldedCircleConfigurationItem>();
 builder.Services.AddSingleton<ElectroluxClient>();
@@ -29,3 +33,17 @@ var app = builder.Build();
 app.UseUnfoldedCircleServer<ElectroluxWebSocketHandler, UnfoldedCircleConfigurationItem>();
 
 await app.RunAsync();
+return;
+
+static void ConfigureShouldHandle(HttpStandardResilienceOptions options)
+{
+    options.Retry.ShouldHandle = static outcome
+        => ValueTask.FromResult(outcome.Outcome.Result is
+        {
+            StatusCode:
+            HttpStatusCode.NotAcceptable or
+            HttpStatusCode.RequestTimeout or
+            HttpStatusCode.TooManyRequests or
+            >= HttpStatusCode.InternalServerError
+        });
+}
