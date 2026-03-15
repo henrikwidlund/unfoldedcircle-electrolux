@@ -9,8 +9,7 @@ builder.Services.AddHttpClient("ElectroluxClient", static client =>
 {
     client.DefaultRequestHeaders.UserAgent.Clear();
     client.DefaultRequestHeaders.UserAgent.ParseAdd("UnfoldedCircle/1.0");
-    client.Timeout = TimeSpan.FromMinutes(30);
-});
+}).AddStandardResilienceHandler();
 
 builder.AddUnfoldedCircleServer<ElectroluxWebSocketHandler, ElectroluxConfigurationService, UnfoldedCircleConfigurationItem>();
 builder.Services.AddSingleton<ElectroluxClient>();
