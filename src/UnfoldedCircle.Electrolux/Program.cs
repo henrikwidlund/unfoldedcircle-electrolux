@@ -22,6 +22,7 @@ builder.Services.AddHttpClient("ElectroluxLiveStreamClient", static client =>
 }).AddStandardResilienceHandler(static options =>
 {
     options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(30);
+    options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2 + TimeSpan.FromSeconds(1);
     ConfigureShouldHandle(options);
 });
 
