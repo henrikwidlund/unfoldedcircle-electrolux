@@ -43,7 +43,7 @@ public sealed class ElectroluxClient(IHttpClientFactory httpClientFactory, IConf
         }
     }
 
-    private async ValueTask<TokenResult?> GetTokenAsync(CancellationToken cancellationToken)
+    public async ValueTask<TokenResult?> GetTokenAsync(CancellationToken cancellationToken)
     {
         if (_currentToken?.ExpiresAt > DateTimeOffset.UtcNow.AddMinutes(-5))
             return _currentToken;

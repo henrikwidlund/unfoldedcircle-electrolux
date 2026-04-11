@@ -11,6 +11,7 @@ namespace UnfoldedCircle.Electrolux.Json;
 [JsonSerializable(typeof(ApplianceState))]
 [JsonSerializable(typeof(LiveStreamResponse))]
 [JsonSerializable(typeof(EmptyStreamEvent))]
+[JsonSerializable(typeof(BackupData))]
 internal sealed partial class ElectroluxJsonSerializerContext : JsonSerializerContext
 {
     static ElectroluxJsonSerializerContext()

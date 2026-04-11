@@ -33,4 +33,12 @@ internal static partial class IntegrationLogger
 
     public static void FailureDuringBroadcast(this ILogger logger, Exception exception, string wsId) =>
         FailureDuringBroadcastAction(logger, wsId, exception);
+
+    [LoggerMessage(EventId = 6, EventName = nameof(TokenResultNullDuringBackup), Level = LogLevel.Error,
+        Message = "TokenResult for Backup during backup creation.")]
+    public static partial void TokenResultNullDuringBackup(this ILogger logger);
+
+    [LoggerMessage(EventId = 7, EventName = nameof(BackupDataDataNullDuringRestore), Level = LogLevel.Error,
+        Message = "BackupData null during restore.")]
+    public static partial void BackupDataDataNullDuringRestore(this ILogger logger);
 }
