@@ -44,7 +44,7 @@ internal static partial class IntegrationLogger
 
     private static readonly Action<ILogger, string, Exception> ExceptionDuringRestoreAction = LoggerMessage.Define<string>(
         LogLevel.Error,
-        new EventId(8, nameof(FailureDuringBroadcast)),
+        new EventId(8, nameof(ExceptionDuringRestore)),
         "[{WSId}] Exception during restore.");
 
     public static void ExceptionDuringRestore(this ILogger logger, Exception exception, string wsId) =>
