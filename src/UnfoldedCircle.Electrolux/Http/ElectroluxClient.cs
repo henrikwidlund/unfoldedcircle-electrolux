@@ -36,6 +36,7 @@ public sealed class ElectroluxClient(IHttpClientFactory httpClientFactory, IConf
             await using var fileStream = File.Open(UcConfigHome, FileMode.Create, FileAccess.Write, FileShare.None);
             await JsonSerializer.SerializeAsync(fileStream, tokenResult, ElectroluxJsonSerializerContext.Default.TokenResult,
                 CancellationToken.None);
+            _currentToken = tokenResult;
         }
         finally
         {

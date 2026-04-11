@@ -748,16 +748,24 @@ internal sealed class ElectroluxWebSocketHandler(
 
     protected override async ValueTask<RestoreResult> HandleRestoreFromBackupAsync(string wsId, string jsonRestoreData, CancellationToken cancellationToken)
     {
-        var backupData = JsonSerializer.Deserialize(jsonRestoreData, ElectroluxJsonSerializerContext.Default.BackupData);
-        if (backupData is null)
+        try
         {
-            _logger.BackupDataDataNullDuringRestore();
+            var backupData = JsonSerializer.Deserialize(jsonRestoreData, ElectroluxJsonSerializerContext.Default.BackupData);
+            if (backupData is null)
+            {
+                _logger.BackupDataNullDuringRestore(wsId);
+                return RestoreResult.Failure;
+            }
+
+            await _configurationService.UpdateConfigurationAsync(backupData.Configuration, cancellationToken);
+            await _electroluxClient.SetTokenAsync(backupData.TokenResult, cancellationToken);
+            return RestoreResult.Success;
+        }
+        catch (Exception e)
+        {
+            _logger.ExceptionDuringRestore(e, wsId);
             return RestoreResult.Failure;
         }
-
-        await _configurationService.UpdateConfigurationAsync(backupData.Configuration, cancellationToken);
-        await _electroluxClient.SetTokenAsync(backupData.TokenResult, cancellationToken);
-        return RestoreResult.Success;
     }
 
     protected override ValueTask<SetupDriverUserDataResult> HandleCreateNewEntity(System.Net.WebSockets.WebSocket socket,
@@ -804,7 +812,7 @@ internal sealed class ElectroluxWebSocketHandler(
         if (tokenResult is null)
         {
             _logger.TokenResultNullDuringBackup();
-            throw new InvalidOperationException("Failed to retrieve token for backup during backup creation.");
+            throw new InvalidOperationException("Failed to retrieve token for backup.");
         }
 
         var config = await _configurationService.GetConfigurationAsync(cancellationToken);
