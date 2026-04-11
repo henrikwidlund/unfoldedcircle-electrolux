@@ -51,11 +51,11 @@ public sealed class ElectroluxClient(IHttpClientFactory httpClientFactory, IConf
 
         if (await TokenSemaphore.WaitAsync(TimeSpan.FromSeconds(1), cancellationToken))
         {
-            if (_currentToken?.ExpiresAt > DateTimeOffset.UtcNow.AddMinutes(-5))
-                return _currentToken;
-
             try
             {
+                if (_currentToken?.ExpiresAt > DateTimeOffset.UtcNow.AddMinutes(-5))
+                    return _currentToken;
+
                 var tokenFilePath = UcConfigHome;
                 if (!File.Exists(tokenFilePath))
                     return null;
