@@ -36,6 +36,7 @@ public sealed class ElectroluxClient(IHttpClientFactory httpClientFactory, IConf
             await using var fileStream = File.Open(UcConfigHome, FileMode.Create, FileAccess.Write, FileShare.None);
             await JsonSerializer.SerializeAsync(fileStream, tokenResult, ElectroluxJsonSerializerContext.Default.TokenResult,
                 CancellationToken.None);
+            _currentToken = tokenResult;
         }
         finally
         {
@@ -43,18 +44,18 @@ public sealed class ElectroluxClient(IHttpClientFactory httpClientFactory, IConf
         }
     }
 
-    private async ValueTask<TokenResult?> GetTokenAsync(CancellationToken cancellationToken)
+    public async ValueTask<TokenResult?> GetTokenAsync(CancellationToken cancellationToken)
     {
         if (_currentToken?.ExpiresAt > DateTimeOffset.UtcNow.AddMinutes(-5))
             return _currentToken;
 
         if (await TokenSemaphore.WaitAsync(TimeSpan.FromSeconds(1), cancellationToken))
         {
-            if (_currentToken?.ExpiresAt > DateTimeOffset.UtcNow.AddMinutes(-5))
-                return _currentToken;
-
             try
             {
+                if (_currentToken?.ExpiresAt > DateTimeOffset.UtcNow.AddMinutes(-5))
+                    return _currentToken;
+
                 var tokenFilePath = UcConfigHome;
                 if (!File.Exists(tokenFilePath))
                     return null;

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 
 using UnfoldedCircle.Electrolux.Configuration;
 using UnfoldedCircle.Electrolux.Http;
+using UnfoldedCircle.Electrolux.Json;
 using UnfoldedCircle.Electrolux.Logging;
 using UnfoldedCircle.Electrolux.Response;
 using UnfoldedCircle.Models.Events;
@@ -745,6 +746,28 @@ internal sealed class ElectroluxWebSocketHandler(
         CancellationToken cancellationToken) =>
         AddSetupConfiguration(payload, cancellationToken);
 
+    protected override async ValueTask<RestoreResult> HandleRestoreFromBackupAsync(string wsId, string jsonRestoreData, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var backupData = JsonSerializer.Deserialize(jsonRestoreData, ElectroluxJsonSerializerContext.Default.BackupData);
+            if (backupData is null)
+            {
+                _logger.BackupDataNullDuringRestore(wsId);
+                return RestoreResult.Failure;
+            }
+
+            await _configurationService.UpdateConfigurationAsync(backupData.Configuration, cancellationToken);
+            await _electroluxClient.SetTokenAsync(backupData.TokenResult, cancellationToken);
+            return RestoreResult.Success;
+        }
+        catch (Exception e)
+        {
+            _logger.ExceptionDuringRestore(e, wsId);
+            return RestoreResult.Failure;
+        }
+    }
+
     protected override ValueTask<SetupDriverUserDataResult> HandleCreateNewEntity(System.Net.WebSockets.WebSocket socket,
         SetDriverUserDataMsg payload,
         string wsId,
@@ -782,6 +805,19 @@ internal sealed class ElectroluxWebSocketHandler(
 
     protected override MediaPlayerEntityCommandMsgData<MediaPlayerCommandId>? DeserializeMediaPlayerCommandPayload(JsonDocument jsonDocument)
         => null;
+
+    protected override async ValueTask<string> GetJsonBackupDataAsync(CancellationToken cancellationToken)
+    {
+        var tokenResult = await _electroluxClient.GetTokenAsync(cancellationToken);
+        if (tokenResult is null)
+        {
+            _logger.TokenResultNullDuringBackup();
+            throw new InvalidOperationException("Failed to retrieve token for backup.");
+        }
+
+        var config = await _configurationService.GetConfigurationAsync(cancellationToken);
+        return JsonSerializer.Serialize(new BackupData(config, tokenResult), ElectroluxJsonSerializerContext.Default.BackupData);
+    }
 
     protected override ValueTask<SettingsPage> CreateNewEntitySettingsPageAsync(CancellationToken cancellationToken)
         => ValueTask.FromResult(CreateSettingsPage(null));
