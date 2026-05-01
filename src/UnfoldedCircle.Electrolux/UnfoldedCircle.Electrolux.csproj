@@ -14,12 +14,8 @@
         <IsAotCompatible>true</IsAotCompatible>
         <RuntimeIdentifiers>linux-x64;linux-arm64;osx-arm64;osx-x64;win-x64;win-arm64</RuntimeIdentifiers>
     </PropertyGroup>
-    
-    <PropertyGroup Condition="'$(PublishUsingAot)' == 'true'">
-        <PublishAot>true</PublishAot>
-    </PropertyGroup>
 
-    <PropertyGroup Condition="'$(PublishUsingAot)' != 'true'">
+    <PropertyGroup Condition="'$(PublishAot)' != 'true'">
         <PublishSingleFile>true</PublishSingleFile>
         <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
