@@ -274,7 +274,7 @@ internal sealed class ElectroluxWebSocketHandler(
             _ => null
         };
         await SendMessageAsync(socket,
-            ResponsePayloadHelpers.CreateClimateStateChangedResponsePayload(
+            ResponsePayloadHelpers.CreateClimateStateChangedPayload(
                 new ClimateStateChangedEventMessageDataAttributes
                 {
                     State = climateState,
@@ -294,7 +294,7 @@ internal sealed class ElectroluxWebSocketHandler(
         {
             EntityIdSelectedOption.TryRemove(entityId, out _);
             return SendMessageAsync(socket,
-                ResponsePayloadHelpers.CreateSelectStateChangedResponsePayload(
+                ResponsePayloadHelpers.CreateSelectStateChangedPayload(
                     new SelectStateChangedEventMessageDataAttributes
                     {
                         State = SelectState.Unknown,
@@ -307,7 +307,7 @@ internal sealed class ElectroluxWebSocketHandler(
         }
         EntityIdSelectedOption[entityId] = fanSpeed.Value.ToString(NumberFormatInfo.InvariantInfo);
         return SendMessageAsync(socket,
-            ResponsePayloadHelpers.CreateSelectStateChangedResponsePayload(
+            ResponsePayloadHelpers.CreateSelectStateChangedPayload(
                 new SelectStateChangedEventMessageDataAttributes
                 {
                     State = SelectState.On,
@@ -351,7 +351,7 @@ internal sealed class ElectroluxWebSocketHandler(
         if (temperature == null)
         {
             return SendMessageAsync(socket,
-                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                     new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
                     entityId,
                     ElectroluxServerConstants.TemperatureSuffix),
@@ -359,7 +359,7 @@ internal sealed class ElectroluxWebSocketHandler(
                 cancellationToken);
         }
         return SendMessageAsync(socket,
-            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+            ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                 new SensorStateChangedEventMessageDataAttributes<short>
                 {
                     State = SensorState.On,
@@ -379,7 +379,7 @@ internal sealed class ElectroluxWebSocketHandler(
         if (humidity == null)
         {
             return SendMessageAsync(socket,
-                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                     new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
                     entityId,
                     ElectroluxServerConstants.HumiditySuffix),
@@ -387,7 +387,7 @@ internal sealed class ElectroluxWebSocketHandler(
                 cancellationToken);
         }
         return SendMessageAsync(socket,
-            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+            ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                 new SensorStateChangedEventMessageDataAttributes<sbyte>
                 {
                     State = SensorState.On,
@@ -407,7 +407,7 @@ internal sealed class ElectroluxWebSocketHandler(
         if (tvoc == null)
         {
             return SendMessageAsync(socket,
-                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                     new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
                     entityId,
                     ElectroluxServerConstants.TvocSuffix),
@@ -415,7 +415,7 @@ internal sealed class ElectroluxWebSocketHandler(
                 cancellationToken);
         }
         return SendMessageAsync(socket,
-            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+            ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                 new SensorStateChangedEventMessageDataAttributes<ushort> { State = SensorState.On, Value = tvoc.Value },
                 entityId,
                 ElectroluxServerConstants.TvocSuffix),
@@ -431,7 +431,7 @@ internal sealed class ElectroluxWebSocketHandler(
         if (co2 == null)
         {
             return SendMessageAsync(socket,
-                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                     new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
                     entityId,
                     ElectroluxServerConstants.Co2Suffix),
@@ -439,7 +439,7 @@ internal sealed class ElectroluxWebSocketHandler(
                 cancellationToken);
         }
         return SendMessageAsync(socket,
-                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                     new SensorStateChangedEventMessageDataAttributes<ushort> { State = SensorState.On, Value = co2.Value },
                     entityId,
                     ElectroluxServerConstants.Co2Suffix),
@@ -455,7 +455,7 @@ internal sealed class ElectroluxWebSocketHandler(
         if (pm1 == null)
         {
             return SendMessageAsync(socket,
-                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                     new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
                     entityId,
                     ElectroluxServerConstants.Pm1Suffix),
@@ -463,7 +463,7 @@ internal sealed class ElectroluxWebSocketHandler(
                 cancellationToken);
         }
         return SendMessageAsync(socket,
-            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+            ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                 new SensorStateChangedEventMessageDataAttributes<ushort> { State = SensorState.On, Value = pm1.Value },
                 entityId,
                 ElectroluxServerConstants.Pm1Suffix),
@@ -479,7 +479,7 @@ internal sealed class ElectroluxWebSocketHandler(
         if (pm25 == null)
         {
             return SendMessageAsync(socket,
-                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                     new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
                     entityId,
                     ElectroluxServerConstants.Pm25Suffix),
@@ -487,7 +487,7 @@ internal sealed class ElectroluxWebSocketHandler(
                 cancellationToken);
         }
         return SendMessageAsync(socket,
-            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+            ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                 new SensorStateChangedEventMessageDataAttributes<ushort> { State = SensorState.On, Value = pm25.Value },
                 entityId,
                 ElectroluxServerConstants.Pm25Suffix),
@@ -503,7 +503,7 @@ internal sealed class ElectroluxWebSocketHandler(
         if (pm10 == null)
         {
             return SendMessageAsync(socket,
-                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                     new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
                     entityId,
                     ElectroluxServerConstants.Pm10Suffix),
@@ -511,7 +511,7 @@ internal sealed class ElectroluxWebSocketHandler(
                 cancellationToken);
         }
         return SendMessageAsync(socket,
-            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+            ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                 new SensorStateChangedEventMessageDataAttributes<ushort> { State = SensorState.On, Value = pm10.Value },
                 entityId,
                 ElectroluxServerConstants.Pm10Suffix),
@@ -527,7 +527,7 @@ internal sealed class ElectroluxWebSocketHandler(
         if (eco2 == null)
         {
             return SendMessageAsync(socket,
-                ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+                ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                     new SensorStateChangedEventMessageDataAttributes<string> { State = SensorState.Unknown, Value = null },
                     entityId,
                     ElectroluxServerConstants.Eco2Suffix),
@@ -535,7 +535,7 @@ internal sealed class ElectroluxWebSocketHandler(
                 cancellationToken);
         }
         return SendMessageAsync(socket,
-            ResponsePayloadHelpers.CreateSensorStateChangedResponsePayload(
+            ResponsePayloadHelpers.CreateSensorStateChangedPayload(
                 new SensorStateChangedEventMessageDataAttributes<ushort> { State = SensorState.On, Value = eco2.Value },
                 entityId,
                 ElectroluxServerConstants.Eco2Suffix),
