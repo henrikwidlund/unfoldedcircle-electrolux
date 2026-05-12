@@ -49,4 +49,16 @@ internal static partial class IntegrationLogger
 
     public static void ExceptionDuringRestore(this ILogger logger, Exception exception, string wsId) =>
         ExceptionDuringRestoreAction(logger, wsId, exception);
+
+    [LoggerMessage(EventId = 9, EventName = nameof(NullLiveStream), Level = LogLevel.Warning,
+        Message = "[{WSId}] Live stream was null, retrying after delay.")]
+    public static partial void NullLiveStream(this ILogger logger, string wsId);
+
+    [LoggerMessage(EventId = 10, EventName = nameof(ReceivedLiveStreamEvent), Level = LogLevel.Trace,
+        Message = "Received live stream event {type}: {data}")]
+    public static partial void ReceivedLiveStreamEvent(this ILogger logger, string type, string data);
+
+    [LoggerMessage(EventId = 11, EventName = nameof(LiveStreamEnded), Level = LogLevel.Information,
+        Message = "[{WSId}] Live stream was null, retrying after delay.")]
+    public static partial void LiveStreamEnded(this ILogger logger, string wsId);
 }

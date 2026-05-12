@@ -243,7 +243,7 @@ public sealed class ElectroluxClient(IHttpClientFactory httpClientFactory, IConf
                            =>
                            {
                                if (_logger.IsEnabled(LogLevel.Trace))
-                                   _logger.LogTrace("Received live stream event {type}: {data}", type, Encoding.UTF8.GetString(data));
+                                   _logger.ReceivedLiveStreamEvent(type, Encoding.UTF8.GetString(data));
 
                                return JsonSerializer.Deserialize<EmptyStreamEvent>(data, ElectroluxJsonSerializerContext.Default.EmptyStreamEvent) ?? EmptyStreamEvent;
                            })
