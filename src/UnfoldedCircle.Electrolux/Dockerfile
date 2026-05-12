@@ -8,7 +8,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY [".editorconfig", "."]
 COPY ["src/UnfoldedCircle.Electrolux/UnfoldedCircle.Electrolux.csproj", "UnfoldedCircle.Electrolux/"]
-RUN dotnet restore "UnfoldedCircle.Electrolux/UnfoldedCircle.Electrolux.csproj" --use-lock-file --locked-mode
+RUN dotnet restore "UnfoldedCircle.Electrolux/UnfoldedCircle.Electrolux.csproj" --locked-mode
 COPY ./src .
 
 FROM build AS publish
