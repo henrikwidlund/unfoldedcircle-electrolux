@@ -278,7 +278,7 @@ internal sealed class ElectroluxWebSocketHandler(
                 new ClimateStateChangedEventMessageDataAttributes
                 {
                     State = climateState,
-                    CurrentTemperature =  temperature
+                    CurrentTemperature = temperature
                 },
                 entityId),
             wsId,

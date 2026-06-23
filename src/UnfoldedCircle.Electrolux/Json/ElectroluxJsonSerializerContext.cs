@@ -17,8 +17,8 @@ internal sealed partial class ElectroluxJsonSerializerContext : JsonSerializerCo
     static ElectroluxJsonSerializerContext()
     {
         Default = new ElectroluxJsonSerializerContext(new JsonSerializerOptions
-            {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            });
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        });
     }
 }
