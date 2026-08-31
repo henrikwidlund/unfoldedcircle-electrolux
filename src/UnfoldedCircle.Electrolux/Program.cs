@@ -26,7 +26,7 @@ builder.Services.AddHttpClient("ElectroluxLiveStreamClient", static client =>
     ConfigureShouldHandle(options);
 });
 
-builder.AddUnfoldedCircleServer<ElectroluxWebSocketHandler, ElectroluxConfigurationService, UnfoldedCircleConfigurationItem>(static options =>
+builder.AddUnfoldedCircleServer<ElectroluxWebSocketHandler, ElectroluxConfigurationService, UnfoldedCircleGlobalConfiguration, UnfoldedCircleConfigurationItem>(static options =>
 {
     options.AdditionalRedactedJsonProperties = [ElectroluxServerConstants.ApiKeyKey, ElectroluxServerConstants.RefreshTokenKey];
 });
@@ -34,7 +34,7 @@ builder.Services.AddSingleton<ElectroluxClient>();
 
 var app = builder.Build();
 
-app.UseUnfoldedCircleServer<ElectroluxWebSocketHandler, UnfoldedCircleConfigurationItem>();
+app.UseUnfoldedCircleServer<ElectroluxWebSocketHandler, UnfoldedCircleGlobalConfiguration, UnfoldedCircleConfigurationItem>();
 
 await app.RunAsync();
 return;

@@ -22,10 +22,10 @@ using UnfoldedCircle.Server.WebSocket;
 namespace UnfoldedCircle.Electrolux.WebSocket;
 
 internal sealed class ElectroluxWebSocketHandler(
-    IConfigurationService<UnfoldedCircleConfigurationItem> configurationService,
+    IConfigurationService<UnfoldedCircleGlobalConfiguration, UnfoldedCircleConfigurationItem> configurationService,
     ElectroluxClient electroluxClient,
     IOptions<UnfoldedCircleOptions> options,
-    ILogger<ElectroluxWebSocketHandler> logger) : UnfoldedCircleWebSocketHandler<MediaPlayerCommandId, UnfoldedCircleConfigurationItem>(configurationService, options, logger)
+    ILogger<ElectroluxWebSocketHandler> logger) : UnfoldedCircleWebSocketHandler<MediaPlayerCommandId, UnfoldedCircleGlobalConfiguration, UnfoldedCircleConfigurationItem>(configurationService, options, logger)
 {
     private readonly ElectroluxClient _electroluxClient = electroluxClient;
     private static readonly ClimateOptions ClimateOptions = new() { TemperatureUnit = TemperatureUnit.Celsius };
@@ -543,7 +543,7 @@ internal sealed class ElectroluxWebSocketHandler(
             cancellationToken);
     }
 
-    private static ClimateState GetClimateState(in WorkMode workMode)
+    private static ClimateState GetClimateState(WorkMode workMode)
         => workMode switch
         {
             WorkMode.PowerOff => ClimateState.Off,
@@ -757,7 +757,11 @@ internal sealed class ElectroluxWebSocketHandler(
                 return RestoreResult.Failure;
             }
 
-            await _configurationService.UpdateConfigurationAsync(backupData.Configuration, cancellationToken);
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract // source generated deserialize doesn't care about default values
+            var restoredConfiguration = backupData.Configuration.GlobalConfiguration is null
+                ? backupData.Configuration with { GlobalConfiguration = new UnfoldedCircleGlobalConfiguration() }
+                : backupData.Configuration;
+            await _configurationService.UpdateConfigurationAsync(restoredConfiguration, cancellationToken);
             await _electroluxClient.SetTokenAsync(backupData.TokenResult, cancellationToken);
             return RestoreResult.Success;
         }
