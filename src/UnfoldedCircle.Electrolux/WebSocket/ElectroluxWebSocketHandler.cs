@@ -186,7 +186,7 @@ internal sealed class ElectroluxWebSocketHandler(
             }
             catch (Exception e)
             {
-                _logger.FailureDuringBroadcast(e, wsId);
+                _logger.FailureDuringBroadcast(wsId, e);
                 await SafeDelayAsync(TimeSpan.FromSeconds(1), cancellationToken);
             }
             finally
@@ -767,7 +767,7 @@ internal sealed class ElectroluxWebSocketHandler(
         }
         catch (Exception e)
         {
-            _logger.ExceptionDuringRestore(e, wsId);
+            _logger.ExceptionDuringRestore(wsId, e);
             return RestoreResult.Failure;
         }
     }
