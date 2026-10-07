@@ -106,7 +106,7 @@ internal sealed class EmptyStreamEventJsonConverter : JsonConverter<EmptyStreamE
         return null;
     }
 
-    private static WorkMode GetWorkMode(in ReadOnlySpan<byte> valueSpan)
+    private static WorkMode GetWorkMode(ReadOnlySpan<byte> valueSpan)
     {
         if (valueSpan.SequenceEqual("PowerOff"u8))
             return WorkMode.PowerOff;

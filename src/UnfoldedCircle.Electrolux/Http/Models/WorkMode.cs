@@ -4,7 +4,7 @@ namespace UnfoldedCircle.Electrolux.Http;
 
 [EnumJsonConverter<WorkMode>(CaseSensitive = false, PropertyName = "Workmode")]
 [JsonConverter(typeof(WorkModeJsonConverter))]
-public enum WorkMode : sbyte
+public enum WorkMode : byte
 {
     PowerOff = 1,
     Auto,
