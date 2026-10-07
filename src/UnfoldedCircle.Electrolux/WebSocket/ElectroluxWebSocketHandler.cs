@@ -74,16 +74,18 @@ internal sealed class ElectroluxWebSocketHandler(
         CancellationToken commandCancellationToken) =>
         ValueTask.FromResult(EntityCommandResult.Other);
 
+    private static readonly SelectFailed SelectFailedResult = new();
+
     protected override async ValueTask<SelectCommandResult> OnSelectOptionCommandAsync(System.Net.WebSockets.WebSocket socket, SelectEntityCommandMsgData payload, string option, string wsId, CancellationTokenWrapper cancellationTokenWrapper,
         CancellationToken commandCancellationToken)
     {
         if (!SelectOptions.Contains(option, StringComparer.OrdinalIgnoreCase))
-            return new SelectCommandResult(EntityCommandResult.Failure, string.Empty);
+            return SelectFailedResult;
 
         var identifier = payload.MsgData.EntityId.GetBaseIdentifier();
         await _electroluxClient.SendCommandAsync(identifier, WorkMode.Manual, sbyte.Parse(option, NumberFormatInfo.InvariantInfo), commandCancellationToken);
         EntityIdSelectedOption[payload.MsgData.EntityId] = option;
-        return new SelectCommandResult(EntityCommandResult.Other, option);
+        return new SelectSucceeded(option);
     }
 
     protected override async ValueTask<SelectCommandResult> OnSelectFirstLastCommandAsync(System.Net.WebSockets.WebSocket socket, SelectEntityCommandMsgData payload, bool first, string wsId, CancellationTokenWrapper cancellationTokenWrapper,
@@ -93,7 +95,7 @@ internal sealed class ElectroluxWebSocketHandler(
         var identifier = payload.MsgData.EntityId.GetBaseIdentifier();
         await _electroluxClient.SendCommandAsync(identifier, WorkMode.Manual, sbyte.Parse(option, NumberFormatInfo.InvariantInfo), commandCancellationToken);
         EntityIdSelectedOption[payload.MsgData.EntityId] = option;
-        return new SelectCommandResult(EntityCommandResult.Other, option);
+        return new SelectSucceeded(option);
     }
 
     protected override async ValueTask<SelectCommandResult> OnSelectNextPreviousCommandAsync(System.Net.WebSockets.WebSocket socket, SelectEntityCommandMsgData payload, bool next, bool cycle, string wsId,
@@ -107,8 +109,8 @@ internal sealed class ElectroluxWebSocketHandler(
             switch (index)
             {
                 case < 0 or > SelectLevelsMaxIndex when !cycle:
-                    // do nothing
-                    return new SelectCommandResult(EntityCommandResult.Other, string.Empty);
+                    // do nothing, the current option stays selected
+                    return new SelectSucceeded(option);
                 case > SelectLevelsMaxIndex:
                     index = 0;
                     break;
@@ -119,13 +121,13 @@ internal sealed class ElectroluxWebSocketHandler(
             option = SelectOptions[index];
             await _electroluxClient.SendCommandAsync(identifier, WorkMode.Manual, sbyte.Parse(option, NumberFormatInfo.InvariantInfo), commandCancellationToken);
             EntityIdSelectedOption[payload.MsgData.EntityId] = option;
-            return new SelectCommandResult(EntityCommandResult.Other, option);
+            return new SelectSucceeded(option);
         }
 
         option = SelectOptions[0];
         await _electroluxClient.SendCommandAsync(identifier, WorkMode.Manual, sbyte.Parse(option, NumberFormatInfo.InvariantInfo), commandCancellationToken);
         EntityIdSelectedOption[payload.MsgData.EntityId] = option;
-        return new SelectCommandResult(EntityCommandResult.Other, option);
+        return new SelectSucceeded(option);
     }
 
     protected override async ValueTask<bool> IsEntityReachableAsync(string wsId, string entityId, CancellationToken cancellationToken)

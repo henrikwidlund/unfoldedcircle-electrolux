@@ -1,6 +1,6 @@
 namespace UnfoldedCircle.Electrolux.Http;
 
-public enum PropertyValueType : sbyte
+public enum PropertyValueType : byte
 {
     WorkMode = 1,
     FanSpeed,
