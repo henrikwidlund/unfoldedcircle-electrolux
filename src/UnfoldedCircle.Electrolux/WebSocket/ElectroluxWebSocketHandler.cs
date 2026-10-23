@@ -36,8 +36,8 @@ internal sealed class ElectroluxWebSocketHandler(
     private static readonly TimeSpan MaxReconnectDelay = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan StandbyCheckInterval = TimeSpan.FromSeconds(1);
     private volatile bool _isInStandby;
-    // Cancelled on standby to close the live stream. Replaced on exit standby.
-    private volatile CancellationTokenSource _standbyCancellationTokenSource = new();
+    // Linked sources of running live streams per websocket. Canceled on standby to close the streams.
+    private readonly ConcurrentDictionary<string, CancellationTokenSource> _liveStreamCancellationTokenSources = new(StringComparer.Ordinal);
 
     protected override ValueTask<EntityCommandResult> OnRemoteCommandAsync(
         System.Net.WebSockets.WebSocket socket,
@@ -158,14 +158,23 @@ internal sealed class ElectroluxWebSocketHandler(
     protected override async ValueTask OnEnterStandbyAsync(EnterStandbyEvent payload, string wsId, CancellationToken cancellationToken)
     {
         _isInStandby = true;
-        await _standbyCancellationTokenSource.CancelAsync();
+        // Flag must be visible before reading the sources, see check in HandleEventUpdatesAsync
+        Interlocked.MemoryBarrier();
+        foreach (var (_, liveStreamCancellationTokenSource) in _liveStreamCancellationTokenSources)
+        {
+            try
+            {
+                await liveStreamCancellationTokenSource.CancelAsync();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Live stream already ended
+            }
+        }
     }
 
     protected override ValueTask OnExitStandbyAsync(ExitStandbyEvent payload, string wsId, CancellationToken cancellationToken)
     {
-        // Old source is not disposed: the event loop may still read its token.
-        if (_standbyCancellationTokenSource.IsCancellationRequested)
-            _standbyCancellationTokenSource = new CancellationTokenSource();
         _isInStandby = false;
         return ValueTask.CompletedTask;
     }
@@ -181,11 +190,16 @@ internal sealed class ElectroluxWebSocketHandler(
                 continue;
             }
 
-            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _standbyCancellationTokenSource.Token);
+            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             var streamCancellationToken = linkedCancellationTokenSource.Token;
+            _liveStreamCancellationTokenSources[wsId] = linkedCancellationTokenSource;
             var receivedEvent = false;
             try
             {
+                // Standby may have started before the source was added
+                if (_isInStandby)
+                    continue;
+
                 using var liveStream = await _electroluxClient.GetLiveStreamAsync(streamCancellationToken);
                 if (liveStream is null)
                 {
@@ -222,6 +236,7 @@ internal sealed class ElectroluxWebSocketHandler(
             }
             finally
             {
+                _liveStreamCancellationTokenSources.TryRemove(new KeyValuePair<string, CancellationTokenSource>(wsId, linkedCancellationTokenSource));
                 ResetSelectOption(subscribedEntitiesHolder.SubscribedEntities.Values);
             }
 
