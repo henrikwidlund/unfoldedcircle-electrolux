@@ -29,6 +29,6 @@ internal static partial class IntegrationLogger
     [LoggerMessage(EventId = 10, Level = LogLevel.Trace, Message = "Received live stream event {type}: {data}")]
     public static partial void ReceivedLiveStreamEvent(this ILogger logger, string type, string data);
 
-    [LoggerMessage(EventId = 11, Level = LogLevel.Information, Message = "[{WSId}] Live stream was null, retrying after delay.")]
+    [LoggerMessage(EventId = 11, Level = LogLevel.Information, Message = "[{WSId}] Live stream ended, reconnecting after delay.")]
     public static partial void LiveStreamEnded(this ILogger logger, string wsId);
 }

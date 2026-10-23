@@ -32,6 +32,12 @@ internal sealed class ElectroluxWebSocketHandler(
     private static readonly string[] SelectOptions = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
     private const int SelectLevelsMaxIndex = 8;
     private static readonly ConcurrentDictionary<string, string> EntityIdSelectedOption = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly TimeSpan MinReconnectDelay = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan MaxReconnectDelay = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan StandbyCheckInterval = TimeSpan.FromSeconds(1);
+    private volatile bool _isInStandby;
+    // Linked sources of running live streams per websocket. Canceled on standby to close the streams.
+    private readonly ConcurrentDictionary<string, CancellationTokenSource> _liveStreamCancellationTokenSources = new(StringComparer.Ordinal);
 
     protected override ValueTask<EntityCommandResult> OnRemoteCommandAsync(
         System.Net.WebSockets.WebSocket socket,
@@ -149,52 +155,96 @@ internal sealed class ElectroluxWebSocketHandler(
     protected override ValueTask OnAbortDriverSetupAsync(AbortDriverSetupEvent payload, string wsId, CancellationToken cancellationToken)
         => ValueTask.CompletedTask;
 
-    protected override ValueTask OnEnterStandbyAsync(EnterStandbyEvent payload, string wsId, CancellationToken cancellationToken)
-        => ValueTask.CompletedTask;
-
-    protected override ValueTask OnExitStandbyAsync(ExitStandbyEvent payload, string wsId, CancellationToken cancellationToken)
-        => ValueTask.CompletedTask;
-
-    protected override async Task HandleEventUpdatesAsync(System.Net.WebSockets.WebSocket socket, string wsId, SubscribedEntitiesHolder subscribedEntitiesHolder, CancellationToken cancellationToken)
+    protected override async ValueTask OnEnterStandbyAsync(EnterStandbyEvent payload, string wsId, CancellationToken cancellationToken)
     {
-        while (!cancellationToken.IsCancellationRequested)
+        _isInStandby = true;
+        // Flag must be visible before reading the sources, see check in HandleEventUpdatesAsync
+        Interlocked.MemoryBarrier();
+        foreach (var (_, liveStreamCancellationTokenSource) in _liveStreamCancellationTokenSources)
         {
             try
             {
-                using var liveStream = await _electroluxClient.GetLiveStreamAsync(cancellationToken);
+                await liveStreamCancellationTokenSource.CancelAsync();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Live stream already ended
+            }
+        }
+    }
+
+    protected override ValueTask OnExitStandbyAsync(ExitStandbyEvent payload, string wsId, CancellationToken cancellationToken)
+    {
+        _isInStandby = false;
+        return ValueTask.CompletedTask;
+    }
+
+    protected override async Task HandleEventUpdatesAsync(System.Net.WebSockets.WebSocket socket, string wsId, SubscribedEntitiesHolder subscribedEntitiesHolder, CancellationToken cancellationToken)
+    {
+        var reconnectDelay = MinReconnectDelay;
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            if (_isInStandby)
+            {
+                await SafeDelayAsync(StandbyCheckInterval, cancellationToken);
+                continue;
+            }
+
+            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            var streamCancellationToken = linkedCancellationTokenSource.Token;
+            _liveStreamCancellationTokenSources[wsId] = linkedCancellationTokenSource;
+            var receivedEvent = false;
+            try
+            {
+                // Standby may have started before the source was added
+                if (_isInStandby)
+                    continue;
+
+                using var liveStream = await _electroluxClient.GetLiveStreamAsync(streamCancellationToken);
                 if (liveStream is null)
                 {
-                    // treat null livestream as transient: wait a bit before trying again
+                    // treat null livestream as transient: wait before trying again
                     _logger.NullLiveStream(wsId);
-                    await SafeDelayAsync(TimeSpan.FromSeconds(1), cancellationToken);
-                    continue;
                 }
-
-                await using var stream = await liveStream.GetStreamAsync(cancellationToken);
-                await foreach (var liveStreamEvent in _electroluxClient.GetLiveStreamEventsAsync(stream, cancellationToken))
+                else
                 {
-                    if (subscribedEntitiesHolder.SubscribedEntities.TryGetValue(liveStreamEvent.ApplianceId, out var subscribedEntities))
-                        await HandleElectroluxEvent(socket, wsId, subscribedEntities, liveStreamEvent, cancellationToken);
-                }
+                    await using var stream = await liveStream.GetStreamAsync(streamCancellationToken);
+                    await foreach (var liveStreamEvent in _electroluxClient.GetLiveStreamEventsAsync(stream, streamCancellationToken))
+                    {
+                        receivedEvent = true;
+                        if (subscribedEntitiesHolder.SubscribedEntities.TryGetValue(liveStreamEvent.ApplianceId, out var subscribedEntities))
+                            await HandleElectroluxEvent(socket, wsId, subscribedEntities, liveStreamEvent, streamCancellationToken);
+                    }
 
-                // If the live stream ends cleanly without throwing, wait briefly before reconnecting
-                _logger.LiveStreamEnded(wsId);
-                await SafeDelayAsync(TimeSpan.FromSeconds(1), cancellationToken);
+                    // If the live stream ends cleanly without throwing, wait before reconnecting
+                    _logger.LiveStreamEnded(wsId);
+                }
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 // Normal shutdown: cancellation requested, exit without logging an error or delaying.
                 return;
             }
+            catch (OperationCanceledException) when (streamCancellationToken.IsCancellationRequested)
+            {
+                // Entered standby: stream closed, wait for exit standby.
+                continue;
+            }
             catch (Exception e)
             {
                 _logger.FailureDuringBroadcast(wsId, e);
-                await SafeDelayAsync(TimeSpan.FromSeconds(1), cancellationToken);
             }
             finally
             {
+                _liveStreamCancellationTokenSources.TryRemove(new KeyValuePair<string, CancellationTokenSource>(wsId, linkedCancellationTokenSource));
                 ResetSelectOption(subscribedEntitiesHolder.SubscribedEntities.Values);
             }
+
+            // A working stream resets the delay. Repeated failures double it.
+            if (receivedEvent)
+                reconnectDelay = MinReconnectDelay;
+            await SafeDelayAsync(reconnectDelay, cancellationToken);
+            reconnectDelay = TimeSpan.FromTicks(Math.Min(reconnectDelay.Ticks * 2, MaxReconnectDelay.Ticks));
         }
     }
 
